@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Studio Ranting — Arsitektur & Interior</title>
+<meta name="description" content="Studio Ranting — studio arsitektur dan interior yang merancang ruang dengan material lokal dan cahaya alami.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#14201b;
+  --panel:#1b2a23;
+  --sand:#e9e2d3;
+  --sand-dim:#cfc6b2;
+  --moss:#7d9b7f;
+  --copper:#b5734a;
+  --line:rgba(233,226,211,0.14);
+  --display:'Space Grotesk',sans-serif;
+  --body:'Inter',sans-serif;
+  --edge:clamp(20px,6vw,72px);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{overflow-x:hidden;scroll-behavior:smooth;}
+body{background:var(--ink);color:var(--sand);font-family:var(--body);line-height:1.6;overflow-x:hidden;max-width:100vw;}
+img{max-width:100%;display:block;}
+a{color:inherit;text-decoration:none;}
+.wrap{max-width:1180px;margin:0 auto;padding:0 var(--edge);}
+
+header{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;justify-content:space-between;align-items:center;padding:22px var(--edge);background:rgba(20,32,27,0.7);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);}
+.logo{font-family:var(--display);font-weight:600;font-size:18px;letter-spacing:0.01em;}
+.logo span{color:var(--copper);}
+.back{font-size:13px;color:var(--sand-dim);border:1px solid var(--line);border-radius:99px;padding:8px 16px;white-space:nowrap;}
+.back:hover{border-color:var(--copper);color:var(--copper);}
+
+.hero{padding:150px var(--edge) 80px;background:linear-gradient(180deg,rgba(125,155,127,0.10),transparent 60%);}
+.eyebrow{font-size:12px;letter-spacing:0.14em;text-transform:uppercase;color:var(--moss);display:flex;align-items:center;gap:10px;}
+.eyebrow::before{content:'';width:18px;height:1px;background:var(--moss);}
+h1{font-family:var(--display);font-weight:600;font-size:clamp(36px,6.5vw,68px);line-height:1.05;margin-top:22px;max-width:14ch;}
+h1 em{font-style:normal;color:var(--copper);}
+.hero p{margin-top:24px;max-width:46ch;color:var(--sand-dim);font-size:16px;}
+.hero-stats{margin-top:56px;display:grid;grid-template-columns:repeat(3,1fr);gap:20px;border-top:1px solid var(--line);padding-top:24px;max-width:560px;}
+.hero-stats .n{font-family:var(--display);font-size:clamp(22px,3vw,30px);color:var(--copper);}
+.hero-stats .l{font-size:11.5px;color:var(--sand-dim);margin-top:4px;}
+
+section{padding:80px var(--edge);}
+.section-head{max-width:600px;margin-bottom:48px;}
+.section-head h2{font-family:var(--display);font-weight:600;font-size:clamp(26px,4vw,40px);margin-top:14px;}
+.section-head p{margin-top:14px;color:var(--sand-dim);font-size:15px;max-width:50ch;}
+
+.work-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);}
+.work-card{background:var(--panel);padding:32px 26px;min-height:220px;display:flex;flex-direction:column;justify-content:flex-end;position:relative;overflow:hidden;}
+.work-card .tag{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--moss);}
+.work-card h3{font-family:var(--display);font-size:21px;margin-top:8px;font-weight:600;}
+.work-card .deco{position:absolute;inset:0;background:radial-gradient(circle at 70% 0%, rgba(181,115,74,0.18), transparent 60%);opacity:.6;}
+
+.services{background:var(--panel);border-top:1px solid var(--line);border-bottom:1px solid var(--line);}
+.svc-list{display:grid;gap:0;border-top:1px solid var(--line);}
+.svc-row{display:grid;grid-template-columns:60px 1fr 1fr;gap:28px;padding:28px 0;border-bottom:1px solid var(--line);align-items:start;}
+.svc-row .num{font-family:var(--display);color:var(--copper);font-size:13px;}
+.svc-row h4{font-family:var(--display);font-size:19px;font-weight:600;}
+.svc-row p{color:var(--sand-dim);font-size:14px;}
+
+.process{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;}
+.process .step{border-top:2px solid var(--moss);padding-top:18px;}
+.process .step .num{font-family:var(--display);color:var(--copper);font-size:13px;}
+.process .step h4{font-family:var(--display);font-size:17px;margin-top:8px;font-weight:600;}
+.process .step p{font-size:13.5px;color:var(--sand-dim);margin-top:8px;}
+
+.cta{background:var(--moss);color:var(--ink);text-align:center;}
+.cta h2{font-family:var(--display);font-weight:600;font-size:clamp(26px,5vw,44px);}
+.cta p{margin-top:14px;max-width:46ch;margin-left:auto;margin-right:auto;}
+.cta .btn{display:inline-flex;margin-top:30px;background:var(--ink);color:var(--sand);padding:13px 28px;border-radius:99px;font-weight:500;font-size:14px;}
+
+footer{padding:32px var(--edge);text-align:center;font-size:12.5px;color:var(--sand-dim);border-top:1px solid var(--line);}
+
+@media(max-width:900px){
+  .work-grid{grid-template-columns:1fr 1fr;}
+  .process{grid-template-columns:1fr 1fr;}
+}
+@media(max-width:680px){
+  .hero{padding-top:120px;}
+  .hero-stats{grid-template-columns:repeat(3,1fr);gap:14px;}
+  .work-grid{grid-template-columns:1fr;}
+  .svc-row{grid-template-columns:40px 1fr;}
+  .svc-row > p{grid-column:2;}
+  .process{grid-template-columns:1fr 1fr;}
+  section{padding:56px var(--edge);}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Studio <span>Ranting</span></div>
+  <a class="back" href="javascript:history.back()">&larr; Kembali</a>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <p class="eyebrow">Arsitektur &amp; Interior</p>
+    <h1>Ruang yang tumbuh dari <em>material</em> dan cahaya tempatnya berdiri.</h1>
+    <p>Studio Ranting merancang rumah, kafe, dan ruang kerja dengan pendekatan kontekstual — memanfaatkan material lokal, ventilasi alami, dan detail yang tahan lama.</p>
+    <div class="hero-stats">
+      <div class="item"><div class="n">38</div><div class="l">Proyek selesai</div></div>
+      <div class="item"><div class="n">9</div><div class="l">Tahun praktik</div></div>
+      <div class="item"><div class="n">4</div><div class="l">Kota dijangkau</div></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">Proyek Terpilih</p>
+      <h2>Beberapa ruang yang sudah dibangun.</h2>
+    </div>
+    <div class="work-grid">
+      <div class="work-card"><div class="deco"></div><div class="tag">Residensial</div><h3>Rumah Beranda Bambu</h3></div>
+      <div class="work-card"><div class="deco"></div><div class="tag">Komersial</div><h3>Kedai Kopi Lintang</h3></div>
+      <div class="work-card"><div class="deco"></div><div class="tag">Interior</div><h3>Kantor Studio Pohon</h3></div>
+    </div>
+  </div>
+</section>
+
+<section class="services">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">Layanan</p>
+      <h2>Dari konsep sampai pengawasan lapangan.</h2>
+    </div>
+    <div class="svc-list">
+      <div class="svc-row"><div class="num">01</div><h4>Desain Arsitektur</h4><p>Perencanaan denah dan fasad yang menyesuaikan iklim dan kebutuhan penghuni.</p></div>
+      <div class="svc-row"><div class="num">02</div><h4>Desain Interior</h4><p>Penataan ruang dalam, pemilihan material, dan furnitur custom.</p></div>
+      <div class="svc-row"><div class="num">03</div><h4>Pengawasan Konstruksi</h4><p>Pendampingan rutin ke lokasi agar hasil sesuai gambar kerja.</p></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">Cara Kerja</p>
+      <h2>Empat tahap menuju ruang jadi.</h2>
+    </div>
+    <div class="process">
+      <div class="step"><div class="num">01</div><h4>Konsultasi</h4><p>Diskusi kebutuhan, lokasi, dan anggaran.</p></div>
+      <div class="step"><div class="num">02</div><h4>Konsep</h4><p>Sketsa awal dan gambaran ruang.</p></div>
+      <div class="step"><div class="num">03</div><h4>Desain Detail</h4><p>Gambar kerja dan pemilihan material.</p></div>
+      <div class="step"><div class="num">04</div><h4>Realisasi</h4><p>Pendampingan pembangunan di lapangan.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="cta">
+  <div class="wrap">
+    <h2>Punya lahan atau ruang yang ingin dirancang ulang?</h2>
+    <p>Ceritakan kebutuhan Anda, studio akan membantu menerjemahkannya jadi ruang yang nyaman ditinggali.</p>
+    <a class="btn" href="javascript:history.back()">Kembali ke Portofolio</a>
+  </div>
+</section>
+
+<footer>Studio Ranting — contoh halaman company profile · Dibuat oleh Elbert Evan</footer>
+
+</body>
+</html>
