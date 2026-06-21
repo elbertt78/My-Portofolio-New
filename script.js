@@ -13,29 +13,19 @@ window.addEventListener('scroll', () => {
   header.classList.toggle('scrolled', window.scrollY > 12);
 }, {passive:true});
 
-// mobile hamburger menu
-(function(){
-  const btn = document.getElementById('hamburger');
-  const menu = document.getElementById('mobile-menu');
-  const links = menu.querySelectorAll('a');
-
-  function closeMenu(){
-    btn.classList.remove('open');
-    menu.classList.remove('open');
-    btn.setAttribute('aria-expanded', 'false');
-    document.body.style.overflow = '';
-  }
-
-  btn.addEventListener('click', () => {
-    const isOpen = menu.classList.toggle('open');
-    btn.classList.toggle('open', isOpen);
-    btn.setAttribute('aria-expanded', String(isOpen));
-    document.body.style.overflow = isOpen ? 'hidden' : '';
-  });
-
-  document.getElementById('mobile-menu-close').addEventListener('click', closeMenu);
-  links.forEach(link => link.addEventListener('click', closeMenu));
-})();
+// mobile menu
+const toggle = document.getElementById('menuToggle');
+const links = document.getElementById('navLinks');
+toggle.addEventListener('click', () => {
+  toggle.classList.toggle('open');
+  links.classList.toggle('open');
+  document.body.style.overflow = links.classList.contains('open') ? 'hidden' : '';
+});
+links.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+  toggle.classList.remove('open');
+  links.classList.remove('open');
+  document.body.style.overflow = '';
+}));
 
 // reduced motion check (dipakai beberapa fitur di bawah)
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
