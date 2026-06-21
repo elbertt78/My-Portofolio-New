@@ -455,17 +455,26 @@
     letter-spacing:2px;
   }
 
-  /* ---------- REVEAL ANIMATION (per element) ---------- */
+  /* ---------- REVEAL ANIMATION (gaya premium: lambat & halus) ---------- */
   .reveal{
     opacity:0;
-    transform:translateY(26px);
-    filter:blur(4px);
-    transition:opacity .7s cubic-bezier(.2,.7,.2,1), transform .7s cubic-bezier(.2,.7,.2,1), filter .7s ease;
+    transform:translateY(48px) scale(0.985);
+    filter:blur(6px);
+    transition:
+      opacity 1.6s cubic-bezier(.16,.74,.2,.995),
+      transform 1.6s cubic-bezier(.16,.74,.2,.995),
+      filter 1.6s cubic-bezier(.16,.74,.2,.995);
+    will-change:opacity, transform, filter;
   }
   .reveal.is-visible{
     opacity:1;
-    transform:translateY(0);
+    transform:translateY(0) scale(1);
     filter:blur(0);
+  }
+  .reveal-lg{
+    transform:translateY(64px) scale(0.97);
+    filter:blur(10px);
+    transition-duration:1.9s;
   }
 
   /* ---------- CTA / FOOTER ---------- */
@@ -607,7 +616,7 @@
 
   @media (prefers-reduced-motion: reduce){
     html{scroll-behavior:auto;}
-    .reveal{transition:none; opacity:1; transform:none; filter:none;}
+    .reveal, .reveal-lg{transition:none; opacity:1; transform:none; filter:none;}
     .card{transition:none;}
   }
 </style>
@@ -652,7 +661,7 @@
 
 <section class="hero" id="beranda">
   <span class="eyebrow reveal">✨ Cerita Nyata, Dampak Nyata</span>
-  <h1 class="headline reveal">
+  <h1 class="headline reveal reveal-lg">
     Bukan sekadar usaha kecil,<br><span class="accent">ini cerita yang naik kelas.</span>
   </h1>
   <p class="sub reveal">
@@ -660,9 +669,9 @@
     inilah suara para pelaku UMKM yang membagikan perjalanan mereka.
   </p>
   <div class="stats reveal">
-    <div class="stat"><div class="num"><span>120</span>+</div><div class="label">UMKM Bergabung</div></div>
-    <div class="stat"><div class="num"><span>4.9</span>/5</div><div class="label">Rata-rata Kepuasan</div></div>
-    <div class="stat"><div class="num"><span>35</span>+</div><div class="label">Kota di Indonesia</div></div>
+    <div class="stat"><div class="num"><span class="count-up" data-target="120" data-decimals="0">0</span>+</div><div class="label">UMKM Bergabung</div></div>
+    <div class="stat"><div class="num"><span class="count-up" data-target="4.9" data-decimals="1">0</span>/5</div><div class="label">Rata-rata Kepuasan</div></div>
+    <div class="stat"><div class="num"><span class="count-up" data-target="35" data-decimals="0">0</span>+</div><div class="label">Kota di Indonesia</div></div>
   </div>
 </section>
 
@@ -822,7 +831,9 @@ function renderGrid() {
   all.forEach((t, i) => {
     const card = document.createElement('div');
     card.className = 'card reveal' + (t.id === lastAddedId ? ' is-new' : '');
-    card.style.transitionDelay = (i % 8) * 70 + 'ms';
+    const columns = window.innerWidth <= 640 ? 1 : (window.innerWidth <= 980 ? 2 : 3);
+    const row = Math.floor(i / columns);
+    card.style.transitionDelay = (row * 180) + 'ms';
     card.innerHTML = `
       ${t.id === lastAddedId ? '<span class="badge-new">BARU</span>' : ''}
       <div class="quote-mark">"</div>
@@ -953,10 +964,17 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && mobileMenu.classList.contains('is-open')) closeMenu();
 });
 
-/* ============ REVEAL ON SCROLL (animasi satu-satu) ============ */
+/* ============ REVEAL ON SCROLL (gaya premium: muncul satu-satu per kelompok) ============ */
 const revealEls = document.querySelectorAll('.reveal');
-revealEls.forEach((el, i) => {
-  el.style.transitionDelay = (i % 8) * 70 + 'ms';
+
+/* beri delay berurutan di dalam tiap section/induk yang sama,
+   supaya elemen yang berjauhan di halaman tidak ikut antre delay yang sama */
+const delayCounters = new Map();
+revealEls.forEach((el) => {
+  const parentKey = el.closest('section, form, div.mobile-menu-foot') || el.parentElement;
+  const count = delayCounters.get(parentKey) || 0;
+  el.style.transitionDelay = (count * 190) + 'ms';
+  delayCounters.set(parentKey, count + 1);
 });
 
 const observer = new IntersectionObserver((entries) => {
@@ -966,9 +984,50 @@ const observer = new IntersectionObserver((entries) => {
       observer.unobserve(entry.target);
     }
   });
-}, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+}, { threshold: 0.15, rootMargin: '0px 0px -60px 0px' });
 
 revealEls.forEach(el => observer.observe(el));
+
+/* ============ COUNT-UP ANGKA STATISTIK (gaya premium, lambat & halus) ============ */
+function easeOutExpo(t) {
+  return t === 1 ? 1 : 1 - Math.pow(2, -10 * t);
+}
+
+function animateCountUp(el) {
+  const target = parseFloat(el.dataset.target);
+  const decimals = parseInt(el.dataset.decimals || '0', 10);
+
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (prefersReduced) {
+    el.textContent = decimals > 0 ? target.toFixed(decimals) : target;
+    return;
+  }
+
+  const duration = 2200;
+  const start = performance.now();
+
+  function tick(now) {
+    const progress = Math.min((now - start) / duration, 1);
+    const eased = easeOutExpo(progress);
+    const value = target * eased;
+    el.textContent = decimals > 0 ? value.toFixed(decimals) : Math.round(value);
+    if (progress < 1) requestAnimationFrame(tick);
+    else el.textContent = decimals > 0 ? target.toFixed(decimals) : target;
+  }
+  requestAnimationFrame(tick);
+}
+
+const countUpEls = document.querySelectorAll('.count-up');
+const countObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      animateCountUp(entry.target);
+      countObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.4 });
+
+countUpEls.forEach(el => countObserver.observe(el));
 
 /* ============ PARTICLE NETWORK BACKGROUND ============ */
 const canvas = document.getElementById('particle-canvas');
