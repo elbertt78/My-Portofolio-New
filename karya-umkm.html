@@ -1,67 +1,782 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Testimoni UMKM — Cerita yang Membangun</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-0:#060a16;
+    --bg-1:#0b1330;
+    --bg-2:#0e1a3d;
+    --line-blue:#4ea8ff;
+    --line-blue-soft:#7dd3fc;
+    --gold:#e8b86d;
+    --gold-soft:#f3d9a8;
+    --ink-100:#f5f7ff;
+    --ink-300:#aab6d9;
+    --ink-500:#6f7da6;
+    --card-bg:rgba(16,24,52,0.55);
+    --card-border:rgba(125,211,252,0.18);
+    --max-w:1180px;
+  }
 
-/* ============================================================
-   DATA AWAL (placeholder — testimoni contoh sebelum ada kiriman)
-   ============================================================ */
+  *{box-sizing:border-box;}
+  html{
+    -webkit-text-size-adjust:100%; text-size-adjust:100%;
+    scroll-behavior:smooth;
+    scroll-padding-top:80px;
+  }
+  body{
+    margin:0;
+    background:var(--bg-0);
+    color:var(--ink-100);
+    font-family:'Inter', sans-serif;
+    overflow-x:hidden;
+    width:100%;
+  }
+
+  #particle-canvas{
+    position:fixed;
+    inset:0;
+    width:100%;
+    height:100%;
+    z-index:0;
+    background:
+      radial-gradient(ellipse 80% 60% at 50% -10%, var(--bg-2) 0%, var(--bg-1) 45%, var(--bg-0) 100%);
+  }
+
+  .vignette{
+    position:fixed;
+    inset:0;
+    z-index:1;
+    pointer-events:none;
+    background:radial-gradient(ellipse 120% 90% at 50% 50%, transparent 40%, var(--bg-0) 100%);
+  }
+
+  .content{
+    position:relative;
+    z-index:2;
+    width:100%;
+    max-width:var(--max-w);
+    margin:0 auto;
+    padding:0 24px;
+  }
+
+  /* ---------- NAVBAR ---------- */
+  header.top{
+    position:fixed;
+    top:0; left:0; right:0;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:18px 24px;
+    z-index:100;
+    background:rgba(6,10,22,0.55);
+    backdrop-filter:blur(14px);
+    -webkit-backdrop-filter:blur(14px);
+    border-bottom:1px solid rgba(125,211,252,0.12);
+  }
+  header.top .top-inner{
+    width:100%;
+    max-width:var(--max-w);
+    margin:0 auto;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+  }
+  .brand{
+    font-family:'Sora', sans-serif;
+    font-weight:700;
+    font-size:clamp(15px, 3.6vw, 18px);
+    letter-spacing:0.02em;
+    color:var(--ink-100);
+    display:flex;
+    align-items:center;
+    gap:10px;
+    text-decoration:none;
+  }
+  .brand .dot{
+    width:9px;height:9px;border-radius:50%;
+    background:var(--gold);
+    box-shadow:0 0 14px 3px rgba(232,184,109,0.6);
+    flex-shrink:0;
+  }
+
+  /* desktop nav links */
+  .nav-links{
+    display:flex;
+    align-items:center;
+    gap:32px;
+    list-style:none;
+    margin:0;
+    padding:0;
+  }
+  .nav-links a{
+    color:var(--ink-300);
+    text-decoration:none;
+    font-size:14px;
+    font-weight:500;
+    letter-spacing:0.01em;
+    transition:color .25s ease;
+    position:relative;
+  }
+  .nav-links a:hover{color:var(--ink-100);}
+  .nav-links a::after{
+    content:'';
+    position:absolute;
+    left:0; bottom:-6px;
+    width:0; height:1px;
+    background:var(--gold);
+    transition:width .25s ease;
+  }
+  .nav-links a:hover::after{width:100%;}
+  .nav-cta{
+    background:linear-gradient(135deg, var(--gold-soft), var(--gold));
+    color:#1a1304 !important;
+    padding:9px 20px;
+    border-radius:999px;
+    font-weight:600 !important;
+  }
+  .nav-cta::after{display:none;}
+
+  /* hamburger button (mobile only) */
+  .hamburger{
+    display:none;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    width:40px;
+    height:40px;
+    background:rgba(125,211,252,0.08);
+    border:1px solid rgba(125,211,252,0.2);
+    border-radius:10px;
+    cursor:pointer;
+    gap:5px;
+    z-index:101;
+    flex-shrink:0;
+  }
+  .hamburger span{
+    display:block;
+    width:18px;
+    height:2px;
+    background:var(--ink-100);
+    border-radius:2px;
+    transition:transform .3s ease, opacity .3s ease;
+  }
+
+  /* mobile fullscreen menu */
+  .mobile-menu{
+    position:fixed;
+    inset:0;
+    z-index:200;
+    background:rgba(6,9,20,0.97);
+    backdrop-filter:blur(18px);
+    -webkit-backdrop-filter:blur(18px);
+    display:flex;
+    flex-direction:column;
+    transform:translateX(100%);
+    transition:transform .4s cubic-bezier(.2,.8,.2,1);
+    visibility:hidden;
+  }
+  .mobile-menu.is-open{
+    transform:translateX(0);
+    visibility:visible;
+  }
+  .mobile-menu-top{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:18px 24px;
+    border-bottom:1px solid rgba(125,211,252,0.12);
+  }
+  .close-btn{
+    width:40px;
+    height:40px;
+    border-radius:10px;
+    background:rgba(125,211,252,0.08);
+    border:1px solid rgba(125,211,252,0.2);
+    color:var(--ink-100);
+    font-size:20px;
+    line-height:1;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    transition:background .25s ease, transform .25s ease, border-color .25s ease;
+  }
+  .close-btn:hover{
+    background:rgba(232,184,109,0.15);
+    border-color:rgba(232,184,109,0.4);
+    transform:rotate(90deg);
+  }
+  .mobile-menu-links{
+    list-style:none;
+    margin:0;
+    padding:36px 28px;
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+  }
+  .mobile-menu-links li{
+    border-bottom:1px solid rgba(125,211,252,0.08);
+  }
+  .mobile-menu-links a{
+    display:block;
+    padding:18px 4px;
+    color:var(--ink-100);
+    text-decoration:none;
+    font-family:'Sora', sans-serif;
+    font-weight:600;
+    font-size:20px;
+    opacity:0;
+    transform:translateX(24px);
+    transition:opacity .4s ease, transform .4s ease;
+  }
+  .mobile-menu.is-open .mobile-menu-links a{
+    opacity:1;
+    transform:translateX(0);
+  }
+  .mobile-menu-links a span{
+    color:var(--ink-500);
+    font-family:'Inter', sans-serif;
+    font-weight:400;
+    font-size:13px;
+    margin-right:10px;
+  }
+  .mobile-menu-foot{
+    margin-top:auto;
+    padding:24px 28px 32px;
+    border-top:1px solid rgba(125,211,252,0.1);
+  }
+  .mobile-menu-foot a.btn{width:100%; text-align:center;}
+
+  body.menu-open{overflow:hidden;}
+
+  @media (max-width:760px){
+    .nav-links{display:none;}
+    .hamburger{display:flex;}
+  }
+
+  /* ---------- HERO ---------- */
+  .hero{
+    padding:calc(clamp(40px,10vh,110px) + 70px) 24px clamp(40px,8vh,80px);
+    text-align:center;
+    max-width:var(--max-w);
+    margin:0 auto;
+    position:relative;
+    z-index:2;
+  }
+  .eyebrow{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    font-size:12px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--line-blue-soft);
+    border:1px solid rgba(125,211,252,0.25);
+    background:rgba(78,168,255,0.08);
+    padding:7px 16px;
+    border-radius:999px;
+    margin-bottom:28px;
+  }
+  h1.headline{
+    font-family:'Sora', sans-serif;
+    font-weight:800;
+    font-size:clamp(34px, 7.2vw, 64px);
+    line-height:1.08;
+    letter-spacing:-0.01em;
+    margin:0 0 20px;
+  }
+  h1.headline .accent{
+    color:var(--gold-soft);
+    background:linear-gradient(90deg, var(--gold-soft), var(--line-blue-soft));
+    -webkit-background-clip:text;
+    background-clip:text;
+    -webkit-text-fill-color:transparent;
+  }
+  .sub{
+    font-size:clamp(15px, 2.6vw, 19px);
+    color:var(--ink-300);
+    max-width:620px;
+    margin:0 auto 40px;
+    line-height:1.6;
+  }
+
+  .stats{
+    display:flex;
+    justify-content:center;
+    gap:clamp(24px, 6vw, 64px);
+    flex-wrap:wrap;
+    margin-top:8px;
+  }
+  .stat{
+    text-align:center;
+    min-width:90px;
+  }
+  .stat .num{
+    font-family:'Sora', sans-serif;
+    font-weight:800;
+    font-size:clamp(24px, 5vw, 34px);
+    color:var(--ink-100);
+  }
+  .stat .num span{color:var(--gold);}
+  .stat .label{
+    font-size:12px;
+    color:var(--ink-500);
+    letter-spacing:0.04em;
+    text-transform:uppercase;
+    margin-top:4px;
+  }
+
+  /* ---------- SECTION KHUSUS TESTIMONI ---------- */
+  .testimoni-section{
+    position:relative;
+    z-index:2;
+    padding:90px 0 110px;
+    margin-top:20px;
+  }
+  .testimoni-section::before{
+    content:'';
+    position:absolute;
+    inset:0;
+    background:linear-gradient(180deg, transparent 0%, rgba(11,19,48,0.45) 12%, rgba(11,19,48,0.45) 88%, transparent 100%);
+    border-top:1px solid rgba(125,211,252,0.1);
+    border-bottom:1px solid rgba(125,211,252,0.1);
+    z-index:-1;
+  }
+
+  /* ---------- SECTION LABEL ---------- */
+  .section-label{
+    text-align:center;
+    margin:0 auto 50px;
+    max-width:600px;
+    padding:0 24px;
+  }
+  .section-label .kicker{
+    font-size:12px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--line-blue-soft);
+    margin-bottom:12px;
+    display:block;
+  }
+  .section-label h2{
+    font-family:'Sora', sans-serif;
+    font-weight:700;
+    font-size:clamp(24px, 5vw, 36px);
+    margin:0;
+    line-height:1.2;
+  }
+
+  /* ---------- TESTIMONI GRID ---------- */
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:22px;
+    padding:0 24px 100px;
+    max-width:var(--max-w);
+    margin:0 auto;
+    position:relative;
+    z-index:2;
+  }
+  @media (max-width:980px){
+    .grid{grid-template-columns:repeat(2,1fr);}
+  }
+  @media (max-width:640px){
+    .grid{grid-template-columns:1fr; gap:16px; padding:0 18px 70px;}
+  }
+
+  .card{
+    background:var(--card-bg);
+    border:1px solid var(--card-border);
+    border-radius:16px;
+    padding:26px 24px;
+    backdrop-filter:blur(6px);
+    display:flex;
+    flex-direction:column;
+    gap:16px;
+    transition:transform .35s ease, border-color .35s ease, box-shadow .35s ease;
+  }
+  .card:hover{
+    transform:translateY(-4px);
+    border-color:rgba(125,211,252,0.4);
+    box-shadow:0 18px 40px -20px rgba(78,168,255,0.35);
+  }
+  .quote-mark{
+    font-family:'Sora', sans-serif;
+    font-size:38px;
+    line-height:1;
+    color:var(--gold);
+    opacity:0.85;
+  }
+  .quote-text{
+    font-size:15px;
+    line-height:1.65;
+    color:var(--ink-100);
+    flex-grow:1;
+  }
+  .person{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin-top:4px;
+    padding-top:16px;
+    border-top:1px solid rgba(125,211,252,0.12);
+  }
+  .avatar{
+    width:42px;height:42px;
+    border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Sora',sans-serif;
+    font-weight:700;
+    font-size:15px;
+    color:var(--bg-0);
+    flex-shrink:0;
+  }
+  .person .who .name{
+    font-family:'Sora', sans-serif;
+    font-weight:600;
+    font-size:14px;
+    color:var(--ink-100);
+  }
+  .person .who .biz{
+    font-size:12px;
+    color:var(--ink-500);
+    margin-top:2px;
+  }
+  .stars{
+    font-size:12px;
+    color:var(--gold);
+    letter-spacing:2px;
+  }
+
+  /* ---------- REVEAL ANIMATION (per element) ---------- */
+  .reveal{
+    opacity:0;
+    transform:translateY(26px);
+    filter:blur(4px);
+    transition:opacity .7s cubic-bezier(.2,.7,.2,1), transform .7s cubic-bezier(.2,.7,.2,1), filter .7s ease;
+  }
+  .reveal.is-visible{
+    opacity:1;
+    transform:translateY(0);
+    filter:blur(0);
+  }
+
+  /* ---------- CTA / FOOTER ---------- */
+  .cta{
+    text-align:center;
+    padding:0 24px clamp(60px,12vh,120px);
+    max-width:680px;
+    margin:0 auto;
+    position:relative;
+    z-index:2;
+  }
+  .cta h3{
+    font-family:'Sora', sans-serif;
+    font-size:clamp(22px,4.6vw,32px);
+    margin:0 0 14px;
+  }
+  .cta p{
+    color:var(--ink-300);
+    font-size:15px;
+    margin:0 0 28px;
+    line-height:1.6;
+  }
+  .btn{
+    display:inline-block;
+    background:linear-gradient(135deg, var(--gold-soft), var(--gold));
+    color:#1a1304;
+    font-family:'Sora', sans-serif;
+    font-weight:700;
+    font-size:15px;
+    padding:14px 32px;
+    border-radius:999px;
+    text-decoration:none;
+    box-shadow:0 12px 30px -10px rgba(232,184,109,0.5);
+    transition:transform .25s ease, box-shadow .25s ease;
+  }
+  .btn:hover{transform:translateY(-2px); box-shadow:0 16px 36px -8px rgba(232,184,109,0.65);}
+  .btn:disabled{opacity:0.6; cursor:default; transform:none !important;}
+
+  /* ---------- KOLOM TESTIMONI (FORM) ---------- */
+  .form-section{
+    padding:90px 24px 100px;
+    position:relative;
+    z-index:2;
+  }
+  .form-card{
+    background:rgba(13,21,48,0.65);
+    border:1px solid rgba(125,211,252,0.2);
+    border-radius:20px;
+    padding:clamp(24px, 4vw, 40px);
+    backdrop-filter:blur(10px);
+    max-width:640px;
+    margin:0 auto;
+  }
+  .form-row-2col{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:16px;
+    margin-bottom:16px;
+  }
+  @media (max-width:560px){
+    .form-row-2col{grid-template-columns:1fr;}
+  }
+  .form-field{margin-bottom:16px;}
+  .form-field label{
+    font-size:12px;
+    color:var(--ink-300);
+    margin-bottom:6px;
+    display:block;
+    letter-spacing:0.02em;
+  }
+  .form-field input,
+  .form-field textarea{
+    width:100%;
+    background:rgba(10,16,36,0.6);
+    border:1px solid rgba(125,211,252,0.22);
+    border-radius:10px;
+    padding:12px 14px;
+    color:var(--ink-100);
+    font-size:14px;
+    font-family:'Inter', sans-serif;
+    outline:none;
+    transition:border-color .2s ease, box-shadow .2s ease;
+  }
+  .form-field input:focus,
+  .form-field textarea:focus{
+    border-color:rgba(125,211,252,0.55);
+    box-shadow:0 0 0 3px rgba(78,168,255,0.15);
+  }
+  .form-field textarea{resize:vertical; min-height:110px; line-height:1.6;}
+  .form-field input.invalid,
+  .form-field textarea.invalid{border-color:rgba(255,120,120,0.6);}
+  .char-count{font-size:11px; color:var(--ink-500); margin-top:6px; text-align:right;}
+  .form-error{font-size:13px; color:#ff9f9f; margin-bottom:14px; display:none;}
+  .form-error.show{display:block;}
+  .form-success{font-size:13px; color:#9ee6a8; margin-top:14px; display:none;}
+  .form-success.show{display:block;}
+  .form-note{font-size:11.5px; color:var(--ink-500); margin-top:18px; margin-bottom:0; line-height:1.6;}
+
+  .badge-new{
+    position:absolute;
+    top:-10px;
+    right:16px;
+    background:linear-gradient(135deg, var(--gold-soft), var(--gold));
+    color:#1a1304;
+    font-family:'Sora', sans-serif;
+    font-weight:700;
+    font-size:11px;
+    padding:4px 12px;
+    border-radius:999px;
+    letter-spacing:0.04em;
+  }
+  .card{position:relative;}
+  .card.is-new{border-color:rgba(232,184,109,0.45) !important;}
+
+  .testimoni-count{
+    font-size:13px;
+    color:var(--ink-500);
+    margin-top:14px;
+    margin-bottom:0;
+  }
+
+  .empty-state{
+    text-align:center;
+    padding:60px 24px;
+    color:var(--ink-500);
+    font-size:14px;
+    grid-column:1/-1;
+  }
+
+  footer.foot{
+    text-align:center;
+    padding:24px;
+    font-size:12px;
+    color:var(--ink-500);
+    position:relative;
+    z-index:2;
+    border-top:1px solid rgba(125,211,252,0.1);
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    html{scroll-behavior:auto;}
+    .reveal{transition:none; opacity:1; transform:none; filter:none;}
+    .card{transition:none;}
+  }
+</style>
+</head>
+<body>
+
+<canvas id="particle-canvas"></canvas>
+<div class="vignette"></div>
+
+<header class="top">
+  <div class="top-inner">
+    <a href="#beranda" class="brand"><span class="dot"></span> Suara UMKM</a>
+
+    <ul class="nav-links">
+      <li><a href="#beranda">Beranda</a></li>
+      <li><a href="#testimoni">Testimoni</a></li>
+      <li><a href="#kirim" class="nav-cta">Kirim Cerita</a></li>
+    </ul>
+
+    <button class="hamburger" id="hamburgerBtn" aria-label="Buka menu" aria-expanded="false">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+  </div>
+</header>
+
+<nav class="mobile-menu" id="mobileMenu" aria-hidden="true">
+  <div class="mobile-menu-top">
+    <a href="#beranda" class="brand"><span class="dot"></span> Suara UMKM</a>
+    <button class="close-btn" id="closeMenuBtn" aria-label="Tutup menu">✕</button>
+  </div>
+  <ul class="mobile-menu-links">
+    <li><a href="#beranda" data-menu-link><span>01</span>Beranda</a></li>
+    <li><a href="#testimoni" data-menu-link><span>02</span>Testimoni</a></li>
+    <li><a href="#kirim" data-menu-link><span>03</span>Kirim Cerita</a></li>
+  </ul>
+  <div class="mobile-menu-foot">
+    <a href="#kirim" class="btn" data-menu-link>Kirim Testimoni Saya</a>
+  </div>
+</nav>
+
+<section class="hero" id="beranda">
+  <span class="eyebrow reveal">✨ Cerita Nyata, Dampak Nyata</span>
+  <h1 class="headline reveal">
+    Bukan sekadar usaha kecil,<br><span class="accent">ini cerita yang naik kelas.</span>
+  </h1>
+  <p class="sub reveal">
+    Dari warung pinggir jalan sampai toko online yang mengirim ke seluruh negeri —
+    inilah suara para pelaku UMKM yang membagikan perjalanan mereka.
+  </p>
+  <div class="stats reveal">
+    <div class="stat"><div class="num"><span>120</span>+</div><div class="label">UMKM Bergabung</div></div>
+    <div class="stat"><div class="num"><span>4.9</span>/5</div><div class="label">Rata-rata Kepuasan</div></div>
+    <div class="stat"><div class="num"><span>35</span>+</div><div class="label">Kota di Indonesia</div></div>
+  </div>
+</section>
+
+<section class="testimoni-section" id="testimoni">
+  <div class="section-label">
+    <span class="kicker reveal">Testimoni Pilihan</span>
+    <h2 class="reveal">Apa kata mereka yang sudah merasakan?</h2>
+    <p class="testimoni-count reveal" id="testimoniCount"></p>
+  </div>
+
+  <div class="grid" id="testimoni-grid"></div>
+</section>
+
+<section class="form-section" id="kirim">
+  <div class="section-label">
+    <span class="kicker reveal">Kolom Testimoni</span>
+    <h2 class="reveal">Punya cerita usaha sendiri?</h2>
+    <p class="sub reveal" style="margin-top:14px;">
+      Isi kolom di bawah ini. Testimoni Anda akan langsung tampil di daftar atas
+      dan jadi inspirasi untuk UMKM lain di seluruh Indonesia.
+    </p>
+  </div>
+
+  <form class="form-card reveal" id="testimoniForm">
+    <div class="form-row-2col">
+      <div class="form-field">
+        <label for="inputNama">Nama Anda *</label>
+        <input type="text" id="inputNama" placeholder="cth. Siti Marlina" maxlength="60">
+      </div>
+      <div class="form-field">
+        <label for="inputKota">Kota / Daerah</label>
+        <input type="text" id="inputKota" placeholder="cth. Bandung" maxlength="60">
+      </div>
+    </div>
+
+    <div class="form-field">
+      <label for="inputUsaha">Nama Usaha *</label>
+      <input type="text" id="inputUsaha" placeholder="cth. Warung Nasi Bu Siti" maxlength="80">
+    </div>
+
+    <div class="form-field">
+      <label for="inputCerita">Ceritakan pengalaman Anda *</label>
+      <textarea id="inputCerita" placeholder="Tuliskan testimoni Anda di sini, minimal 10 karakter..." maxlength="400"></textarea>
+      <div class="char-count"><span id="charCount">0</span>/400</div>
+    </div>
+
+    <div class="form-error" id="formError">Mohon isi nama, nama usaha, dan testimoni (minimal 10 karakter).</div>
+
+    <button type="submit" class="btn" id="submitBtn">Kirim Testimoni Saya</button>
+
+    <div class="form-success" id="formSuccess">✓ Terkirim! Testimoni Anda sudah tampil di bagian atas daftar.</div>
+
+    <p class="form-note">Testimoni yang dikirim tersimpan otomatis di perangkat ini, sehingga tetap ada saat halaman dibuka kembali.</p>
+  </form>
+</section>
+
+<footer class="foot">© 2026 Suara UMKM. Dibuat dengan semangat untuk usaha kecil Indonesia.</footer>
+
+<script>
+/* ============ DATA TESTIMONI AWAL (placeholder — silakan ganti) ============ */
 const seedTestimonials = [
   {
     id: "seed-1",
-    quote:
-      "Sejak ikut pelatihan digital marketing, omzet warung saya naik hampir dua kali lipat. Sekarang pelanggan bisa pesan lewat WhatsApp dan ojek online.",
+    quote: "Sejak ikut pelatihan digital marketing, omzet warung saya naik hampir dua kali lipat. Sekarang pelanggan bisa pesan lewat WhatsApp dan ojek online.",
     name: "Siti Marlina",
     biz: "Warung Nasi Bu Siti",
     city: "Bandung",
-    color: "#4ea8ff",
+    color: "#4ea8ff"
   },
   {
     id: "seed-2",
-    quote:
-      "Awalnya saya jualan kerupuk cuma di pasar. Sekarang sudah punya kemasan sendiri dan masuk ke beberapa minimarket lokal. Terima kasih atas bimbingannya!",
+    quote: "Awalnya saya jualan kerupuk cuma di pasar. Sekarang sudah punya kemasan sendiri dan masuk ke beberapa minimarket lokal. Terima kasih atas bimbingannya!",
     name: "Agus Setiawan",
     biz: "Kerupuk Renyah Maknyus",
     city: "Tegal",
-    color: "#e8b86d",
+    color: "#e8b86d"
   },
   {
     id: "seed-3",
-    quote:
-      "Pendampingan legalitas usaha bikin saya berani mengirim sample kopi ke luar kota. Prosesnya ternyata lebih mudah dari yang saya kira.",
+    quote: "Pendampingan legalitas usaha bikin saya berani mengirim sample kopi ke luar kota. Prosesnya ternyata lebih mudah dari yang saya kira.",
     name: "Yuliana Putri",
     biz: "Kopi Gunung Lestari",
     city: "Toraja",
-    color: "#7dd3fc",
+    color: "#7dd3fc"
   },
   {
     id: "seed-4",
-    quote:
-      "Dulu cuma jual baju di rumah. Setelah belajar foto produk dan copywriting, toko online saya jadi terlihat lebih profesional dan dipercaya pembeli.",
+    quote: "Dulu cuma jual baju di rumah. Setelah belajar foto produk dan copywriting, toko online saya jadi terlihat lebih profesional dan dipercaya pembeli.",
     name: "Rahmat Hidayat",
     biz: "RH Apparel",
     city: "Yogyakarta",
-    color: "#e8b86d",
+    color: "#e8b86d"
   },
   {
     id: "seed-5",
-    quote:
-      "Akses permodalan yang dulu terasa sulit jadi lebih jelas arahnya. Sekarang saya bisa menambah dua mesin jahit baru untuk produksi tas.",
+    quote: "Akses permodalan yang dulu terasa sulit jadi lebih jelas arahnya. Sekarang saya bisa menambah dua mesin jahit baru untuk produksi tas.",
     name: "Dewi Anggraini",
     biz: "Tas Rajut Dewi",
     city: "Solo",
-    color: "#4ea8ff",
+    color: "#4ea8ff"
   },
   {
     id: "seed-6",
-    quote:
-      "Yang paling berkesan adalah komunitasnya. Sesama pelaku UMKM saling bantu promosi dan kasih masukan. Rasanya seperti punya tim sendiri.",
+    quote: "Yang paling berkesan adalah komunitasnya. Sesama pelaku UMKM saling bantu promosi dan kasih masukan. Rasanya seperti punya tim sendiri.",
     name: "Bambang Wijaya",
     biz: "Camilan Gurih Bambang",
     city: "Surabaya",
-    color: "#7dd3fc",
-  },
+    color: "#7dd3fc"
+  }
 ];
 
 const AVATAR_COLORS = ["#4ea8ff", "#e8b86d", "#7dd3fc", "#f3d9a8", "#6ea8ff"];
-const STORAGE_KEY = "testimonials-list";
+const STORAGE_KEY = "umkm-testimonials-v1";
+let lastAddedId = null;
 
 function getInitial(name) {
   if (!name) return "?";
@@ -70,998 +785,298 @@ function getInitial(name) {
   return (parts[0][0] + parts[1][0]).toUpperCase();
 }
 
-/* ============================================================
-   PARTICLE NETWORK BACKGROUND (canvas)
-   ============================================================ */
-function ParticleBackground() {
-  const canvasRef = useRef(null);
-  const mouseRef = useRef({ x: null, y: null, active: false });
-  const particlesRef = useRef([]);
-  const rafRef = useRef(null);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext("2d");
-    let dpr = Math.min(window.devicePixelRatio || 1, 2);
-
-    const isMobile = () => window.innerWidth < 700;
-
-    const initParticles = (w, h) => {
-      const count = isMobile() ? 34 : 80;
-      const arr = [];
-      for (let i = 0; i < count; i++) {
-        arr.push({
-          x: Math.random() * w,
-          y: Math.random() * h,
-          vx: (Math.random() - 0.5) * 0.35,
-          vy: (Math.random() - 0.5) * 0.35,
-          r: Math.random() * 1.6 + 0.6,
-        });
-      }
-      particlesRef.current = arr;
-    };
-
-    const resize = () => {
-      const w = window.innerWidth;
-      const h = window.innerHeight;
-      canvas.width = w * dpr;
-      canvas.height = h * dpr;
-      canvas.style.width = w + "px";
-      canvas.style.height = h + "px";
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      initParticles(w, h);
-    };
-
-    const step = () => {
-      const w = window.innerWidth;
-      const h = window.innerHeight;
-      ctx.clearRect(0, 0, w, h);
-      const linkDist = isMobile() ? 105 : 150;
-      const particles = particlesRef.current;
-      const mouse = mouseRef.current;
-
-      for (let i = 0; i < particles.length; i++) {
-        const p = particles[i];
-        p.x += p.vx;
-        p.y += p.vy;
-        if (p.x < 0 || p.x > w) p.vx *= -1;
-        if (p.y < 0 || p.y > h) p.vy *= -1;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        ctx.fillStyle = "rgba(125,211,252,0.85)";
-        ctx.fill();
-      }
-
-      for (let i = 0; i < particles.length; i++) {
-        for (let j = i + 1; j < particles.length; j++) {
-          const a = particles[i],
-            b = particles[j];
-          const dx = a.x - b.x,
-            dy = a.y - b.y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < linkDist) {
-            const opacity = (1 - dist / linkDist) * 0.5;
-            ctx.beginPath();
-            ctx.moveTo(a.x, a.y);
-            ctx.lineTo(b.x, b.y);
-            ctx.strokeStyle = `rgba(78,168,255,${opacity})`;
-            ctx.lineWidth = 0.7;
-            ctx.stroke();
-          }
-        }
-        if (mouse.active) {
-          const dx = particles[i].x - mouse.x;
-          const dy = particles[i].y - mouse.y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          const mouseDist = isMobile() ? 120 : 200;
-          if (dist < mouseDist) {
-            const opacity = (1 - dist / mouseDist) * 0.65;
-            ctx.beginPath();
-            ctx.moveTo(particles[i].x, particles[i].y);
-            ctx.lineTo(mouse.x, mouse.y);
-            ctx.strokeStyle = `rgba(232,184,109,${opacity})`;
-            ctx.lineWidth = 0.8;
-            ctx.stroke();
-          }
-        }
-      }
-      rafRef.current = requestAnimationFrame(step);
-    };
-
-    const onMove = (e) => {
-      mouseRef.current = { x: e.clientX, y: e.clientY, active: true };
-    };
-    const onLeave = () => {
-      mouseRef.current.active = false;
-    };
-
-    resize();
-    rafRef.current = requestAnimationFrame(step);
-    window.addEventListener("resize", resize);
-    window.addEventListener("mousemove", onMove);
-    window.addEventListener("mouseleave", onLeave);
-
-    return () => {
-      cancelAnimationFrame(rafRef.current);
-      window.removeEventListener("resize", resize);
-      window.removeEventListener("mousemove", onMove);
-      window.removeEventListener("mouseleave", onLeave);
-    };
-  }, []);
-
-  return (
-    <canvas
-      ref={canvasRef}
-      style={{
-        position: "fixed",
-        inset: 0,
-        width: "100%",
-        height: "100%",
-        zIndex: 0,
-        background:
-          "radial-gradient(ellipse 80% 60% at 50% -10%, #0e1a3d 0%, #0b1330 45%, #060a16 100%)",
-      }}
-    />
-  );
+function loadStoredTestimonials() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (err) {
+    return [];
+  }
 }
 
-/* ============================================================
-   REVEAL ON SCROLL — animasi muncul satu per satu
-   ============================================================ */
-function useReveal() {
-  const ref = useRef(null);
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setVisible(true);
-            observer.unobserve(entry.target);
-          }
-        });
-      },
-      { threshold: 0.15, rootMargin: "0px 0px -40px 0px" }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
-
-  return [ref, visible];
+function saveStoredTestimonials(list) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+    return true;
+  } catch (err) {
+    return false;
+  }
 }
 
-function Reveal({ as: Tag = "div", delay = 0, className = "", style = {}, children }) {
-  const [ref, visible] = useReveal();
-  return (
-    <Tag
-      ref={ref}
-      className={className}
-      style={{
-        opacity: visible ? 1 : 0,
-        transform: visible ? "translateY(0)" : "translateY(26px)",
-        filter: visible ? "blur(0px)" : "blur(4px)",
-        transition: `opacity .7s cubic-bezier(.2,.7,.2,1) ${delay}ms, transform .7s cubic-bezier(.2,.7,.2,1) ${delay}ms, filter .7s ease ${delay}ms`,
-        ...style,
-      }}
-    >
-      {children}
-    </Tag>
-  );
+/* gabungkan: testimoni baru (tersimpan) tampil duluan, lalu data contoh */
+function getAllTestimonials() {
+  const stored = loadStoredTestimonials();
+  return [...stored, ...seedTestimonials];
 }
 
-/* ============================================================
-   KARTU TESTIMONI
-   ============================================================ */
-function TestimonialCard({ t, index, isNew }) {
-  const [ref, visible] = useReveal();
-  const delay = (index % 8) * 70;
+/* ============ RENDER GRID TESTIMONI ============ */
+const grid = document.getElementById('testimoni-grid');
+const countLabel = document.getElementById('testimoniCount');
 
-  return (
-    <div
-      ref={ref}
-      style={{
-        background: "rgba(16,24,52,0.55)",
-        border: isNew ? "1px solid rgba(232,184,109,0.45)" : "1px solid rgba(125,211,252,0.18)",
-        borderRadius: 16,
-        padding: "26px 24px",
-        backdropFilter: "blur(6px)",
-        display: "flex",
-        flexDirection: "column",
-        gap: 16,
-        opacity: visible ? 1 : 0,
-        transform: visible ? "translateY(0)" : "translateY(26px)",
-        filter: visible ? "blur(0px)" : "blur(4px)",
-        transition: `opacity .7s cubic-bezier(.2,.7,.2,1) ${delay}ms, transform .7s cubic-bezier(.2,.7,.2,1) ${delay}ms, filter .7s ease ${delay}ms, border-color .35s ease, box-shadow .35s ease`,
-        position: "relative",
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.transform = "translateY(-4px)";
-        e.currentTarget.style.boxShadow = "0 18px 40px -20px rgba(78,168,255,0.35)";
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.transform = visible ? "translateY(0)" : "translateY(26px)";
-        e.currentTarget.style.boxShadow = "none";
-      }}
-    >
-      {isNew && (
-        <span
-          style={{
-            position: "absolute",
-            top: -10,
-            right: 16,
-            background: "linear-gradient(135deg,#f3d9a8,#e8b86d)",
-            color: "#1a1304",
-            fontFamily: "'Sora', sans-serif",
-            fontWeight: 700,
-            fontSize: 11,
-            padding: "4px 12px",
-            borderRadius: 999,
-            letterSpacing: "0.04em",
-          }}
-        >
-          BARU
-        </span>
-      )}
-      <div style={{ fontFamily: "'Sora', sans-serif", fontSize: 38, lineHeight: 1, color: "#e8b86d", opacity: 0.85 }}>
-        "
-      </div>
-      <div style={{ fontSize: 15, lineHeight: 1.65, color: "#f5f7ff", flexGrow: 1 }}>{t.quote}</div>
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: 12,
-          marginTop: 4,
-          paddingTop: 16,
-          borderTop: "1px solid rgba(125,211,252,0.12)",
-        }}
-      >
-        <div
-          style={{
-            width: 42,
-            height: 42,
-            borderRadius: "50%",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontFamily: "'Sora', sans-serif",
-            fontWeight: 700,
-            fontSize: 15,
-            color: "#060a16",
-            flexShrink: 0,
-            background: t.color,
-          }}
-        >
-          {getInitial(t.name)}
-        </div>
-        <div>
-          <div style={{ fontFamily: "'Sora', sans-serif", fontWeight: 600, fontSize: 14, color: "#f5f7ff" }}>
-            {t.name}
-          </div>
-          <div style={{ fontSize: 12, color: "#6f7da6", marginTop: 2 }}>
-            {t.biz}
-            {t.city ? ` — ${t.city}` : ""}
-          </div>
+function renderGrid() {
+  const all = getAllTestimonials();
+  grid.innerHTML = '';
+
+  all.forEach((t, i) => {
+    const card = document.createElement('div');
+    card.className = 'card reveal' + (t.id === lastAddedId ? ' is-new' : '');
+    card.style.transitionDelay = (i % 8) * 70 + 'ms';
+    card.innerHTML = `
+      ${t.id === lastAddedId ? '<span class="badge-new">BARU</span>' : ''}
+      <div class="quote-mark">"</div>
+      <div class="quote-text"></div>
+      <div class="person">
+        <div class="avatar" style="background:${t.color}">${getInitial(t.name)}</div>
+        <div class="who">
+          <div class="name"></div>
+          <div class="biz"></div>
         </div>
       </div>
-      <div style={{ fontSize: 12, color: "#e8b86d", letterSpacing: 2 }}>★★★★★</div>
-    </div>
-  );
+      <div class="stars">★★★★★</div>
+    `;
+    card.querySelector('.quote-text').textContent = t.quote;
+    card.querySelector('.name').textContent = t.name;
+    card.querySelector('.biz').textContent = t.city ? `${t.biz} — ${t.city}` : t.biz;
+    grid.appendChild(card);
+  });
+
+  if (countLabel) {
+    countLabel.textContent = `Menampilkan ${all.length} testimoni dari UMKM di seluruh Indonesia.`;
+  }
+
+  // pasang ulang observer reveal untuk kartu yang baru dibuat
+  document.querySelectorAll('#testimoni-grid .reveal').forEach(el => observer.observe(el));
 }
 
-/* ============================================================
-   FORM KIRIM TESTIMONI
-   ============================================================ */
-function TestimoniForm({ onSubmit, status }) {
-  const [name, setName] = useState("");
-  const [biz, setBiz] = useState("");
-  const [city, setCity] = useState("");
-  const [quote, setQuote] = useState("");
-  const [touched, setTouched] = useState(false);
+/* ============ FORM KIRIM TESTIMONI ============ */
+const testimoniForm = document.getElementById('testimoniForm');
+const inputNama = document.getElementById('inputNama');
+const inputKota = document.getElementById('inputKota');
+const inputUsaha = document.getElementById('inputUsaha');
+const inputCerita = document.getElementById('inputCerita');
+const charCount = document.getElementById('charCount');
+const formError = document.getElementById('formError');
+const formSuccess = document.getElementById('formSuccess');
+const submitBtn = document.getElementById('submitBtn');
 
-  const isValid = name.trim() && biz.trim() && quote.trim().length >= 10;
+inputCerita.addEventListener('input', () => {
+  charCount.textContent = inputCerita.value.length;
+});
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setTouched(true);
-    if (!isValid) return;
-    onSubmit({ name: name.trim(), biz: biz.trim(), city: city.trim(), quote: quote.trim() });
-    setName("");
-    setBiz("");
-    setCity("");
-    setQuote("");
-    setTouched(false);
+testimoniForm.addEventListener('submit', (e) => {
+  e.preventDefault();
+
+  const name = inputNama.value.trim();
+  const city = inputKota.value.trim();
+  const biz = inputUsaha.value.trim();
+  const quote = inputCerita.value.trim();
+
+  const isValid = name.length > 0 && biz.length > 0 && quote.length >= 10;
+
+  [inputNama, inputUsaha, inputCerita].forEach(el => el.classList.remove('invalid'));
+  formError.classList.remove('show');
+  formSuccess.classList.remove('show');
+
+  if (!isValid) {
+    if (!name) inputNama.classList.add('invalid');
+    if (!biz) inputUsaha.classList.add('invalid');
+    if (quote.length < 10) inputCerita.classList.add('invalid');
+    formError.classList.add('show');
+    return;
+  }
+
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Mengirim...';
+
+  const newItem = {
+    id: 't-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7),
+    quote: quote,
+    name: name,
+    biz: biz,
+    city: city,
+    color: AVATAR_COLORS[Math.floor(Math.random() * AVATAR_COLORS.length)],
+    createdAt: Date.now()
   };
 
-  const inputStyle = {
-    width: "100%",
-    background: "rgba(10,16,36,0.6)",
-    border: "1px solid rgba(125,211,252,0.22)",
-    borderRadius: 10,
-    padding: "12px 14px",
-    color: "#f5f7ff",
-    fontSize: 14,
-    fontFamily: "'Inter', sans-serif",
-    outline: "none",
-    transition: "border-color .2s ease, box-shadow .2s ease",
-  };
+  const stored = loadStoredTestimonials();
+  stored.unshift(newItem);
+  const saved = saveStoredTestimonials(stored);
 
-  const labelStyle = {
-    fontSize: 12,
-    color: "#aab6d9",
-    marginBottom: 6,
-    display: "block",
-    letterSpacing: "0.02em",
-  };
+  setTimeout(() => {
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Kirim Testimoni Saya';
 
-  return (
-    <form
-      onSubmit={handleSubmit}
-      style={{
-        background: "rgba(13,21,48,0.65)",
-        border: "1px solid rgba(125,211,252,0.2)",
-        borderRadius: 20,
-        padding: "clamp(24px, 4vw, 40px)",
-        backdropFilter: "blur(10px)",
-        maxWidth: 640,
-        margin: "0 auto",
-        position: "relative",
-        zIndex: 2,
-      }}
-    >
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}
-           className="form-row-2col">
-        <div>
-          <label style={labelStyle}>Nama Anda *</label>
-          <input
-            style={{
-              ...inputStyle,
-              borderColor: touched && !name.trim() ? "rgba(255,120,120,0.6)" : inputStyle.border,
-            }}
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="cth. Siti Marlina"
-            maxLength={60}
-          />
-        </div>
-        <div>
-          <label style={labelStyle}>Kota / Daerah</label>
-          <input
-            style={inputStyle}
-            value={city}
-            onChange={(e) => setCity(e.target.value)}
-            placeholder="cth. Bandung"
-            maxLength={60}
-          />
-        </div>
-      </div>
-
-      <div style={{ marginBottom: 16 }}>
-        <label style={labelStyle}>Nama Usaha *</label>
-        <input
-          style={{
-            ...inputStyle,
-            borderColor: touched && !biz.trim() ? "rgba(255,120,120,0.6)" : inputStyle.border,
-          }}
-          value={biz}
-          onChange={(e) => setBiz(e.target.value)}
-          placeholder="cth. Warung Nasi Bu Siti"
-          maxLength={80}
-        />
-      </div>
-
-      <div style={{ marginBottom: 8 }}>
-        <label style={labelStyle}>Ceritakan pengalaman Anda *</label>
-        <textarea
-          style={{ ...inputStyle, resize: "vertical", minHeight: 110, lineHeight: 1.6 }}
-          value={quote}
-          onChange={(e) => setQuote(e.target.value)}
-          placeholder="Tuliskan testimoni Anda di sini, minimal 10 karakter..."
-          maxLength={400}
-        />
-        <div style={{ fontSize: 11, color: "#6f7da6", marginTop: 6, textAlign: "right" }}>
-          {quote.length}/400
-        </div>
-      </div>
-
-      {touched && !isValid && (
-        <div style={{ fontSize: 13, color: "#ff9f9f", marginBottom: 14 }}>
-          Mohon isi nama, nama usaha, dan testimoni (minimal 10 karakter).
-        </div>
-      )}
-
-      <button
-        type="submit"
-        disabled={status === "saving"}
-        style={{
-          display: "inline-flex",
-          alignItems: "center",
-          gap: 8,
-          background: "linear-gradient(135deg,#f3d9a8,#e8b86d)",
-          color: "#1a1304",
-          fontFamily: "'Sora', sans-serif",
-          fontWeight: 700,
-          fontSize: 15,
-          padding: "13px 30px",
-          borderRadius: 999,
-          border: "none",
-          cursor: status === "saving" ? "default" : "pointer",
-          boxShadow: "0 12px 30px -10px rgba(232,184,109,0.5)",
-          opacity: status === "saving" ? 0.7 : 1,
-          transition: "transform .2s ease",
-        }}
-        onMouseEnter={(e) => {
-          if (status !== "saving") e.currentTarget.style.transform = "translateY(-2px)";
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.transform = "translateY(0)";
-        }}
-      >
-        {status === "saving" ? "Mengirim..." : "Kirim Testimoni Saya"}
-      </button>
-
-      {status === "success" && (
-        <div style={{ marginTop: 14, fontSize: 13, color: "#9ee6a8" }}>
-          ✓ Terkirim! Testimoni Anda sudah tampil di bagian atas daftar.
-        </div>
-      )}
-      {status === "error" && (
-        <div style={{ marginTop: 14, fontSize: 13, color: "#ff9f9f" }}>
-          Gagal menyimpan. Mohon coba kirim sekali lagi.
-        </div>
-      )}
-
-      <p style={{ fontSize: 11.5, color: "#6f7da6", marginTop: 18, marginBottom: 0, lineHeight: 1.6 }}>
-        Testimoni yang dikirim akan tampil otomatis ke semua pengunjung halaman ini.
-      </p>
-    </form>
-  );
-}
-
-/* ============================================================
-   NAVBAR (desktop + mobile fullscreen menu dengan tombol silang)
-   ============================================================ */
-function Navbar({ menuOpen, setMenuOpen, refs }) {
-  const navLinkStyle = {
-    color: "#aab6d9",
-    textDecoration: "none",
-    fontSize: 14,
-    fontWeight: 500,
-    cursor: "pointer",
-  };
-
-  const scrollTo = (ref) => {
-    setMenuOpen(false);
-    ref?.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-  };
-
-  return (
-    <>
-      <header
-        style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          right: 0,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          padding: "16px 24px",
-          zIndex: 100,
-          background: "rgba(6,10,22,0.6)",
-          backdropFilter: "blur(14px)",
-          borderBottom: "1px solid rgba(125,211,252,0.12)",
-        }}
-      >
-        <div
-          style={{
-            width: "100%",
-            maxWidth: 1180,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <div
-            onClick={() => scrollTo(refs.hero)}
-            style={{
-              fontFamily: "'Sora', sans-serif",
-              fontWeight: 700,
-              fontSize: "clamp(15px,3.6vw,18px)",
-              color: "#f5f7ff",
-              display: "flex",
-              alignItems: "center",
-              gap: 10,
-              cursor: "pointer",
-            }}
-          >
-            <span
-              style={{
-                width: 9,
-                height: 9,
-                borderRadius: "50%",
-                background: "#e8b86d",
-                boxShadow: "0 0 14px 3px rgba(232,184,109,0.6)",
-              }}
-            />
-            Suara UMKM
-          </div>
-
-          <ul
-            className="nav-links-desktop"
-            style={{ display: "flex", alignItems: "center", gap: 32, listStyle: "none", margin: 0, padding: 0 }}
-          >
-            <li><a style={navLinkStyle} onClick={() => scrollTo(refs.hero)}>Beranda</a></li>
-            <li><a style={navLinkStyle} onClick={() => scrollTo(refs.testimoni)}>Testimoni</a></li>
-            <li>
-              <a
-                onClick={() => scrollTo(refs.kirim)}
-                style={{
-                  background: "linear-gradient(135deg,#f3d9a8,#e8b86d)",
-                  color: "#1a1304",
-                  padding: "9px 20px",
-                  borderRadius: 999,
-                  fontWeight: 600,
-                  fontSize: 14,
-                  cursor: "pointer",
-                }}
-              >
-                Kirim Cerita
-              </a>
-            </li>
-          </ul>
-
-          <button
-            className="hamburger-btn"
-            onClick={() => setMenuOpen(true)}
-            aria-label="Buka menu"
-            style={{
-              display: "none",
-              flexDirection: "column",
-              justifyContent: "center",
-              alignItems: "center",
-              width: 40,
-              height: 40,
-              background: "rgba(125,211,252,0.08)",
-              border: "1px solid rgba(125,211,252,0.2)",
-              borderRadius: 10,
-              cursor: "pointer",
-              gap: 5,
-            }}
-          >
-            <span style={{ width: 18, height: 2, background: "#f5f7ff", borderRadius: 2 }} />
-            <span style={{ width: 18, height: 2, background: "#f5f7ff", borderRadius: 2 }} />
-            <span style={{ width: 18, height: 2, background: "#f5f7ff", borderRadius: 2 }} />
-          </button>
-        </div>
-      </header>
-
-      {/* MOBILE FULLSCREEN MENU */}
-      <nav
-        aria-hidden={!menuOpen}
-        style={{
-          position: "fixed",
-          inset: 0,
-          zIndex: 200,
-          background: "rgba(6,9,20,0.97)",
-          backdropFilter: "blur(18px)",
-          display: "flex",
-          flexDirection: "column",
-          transform: menuOpen ? "translateX(0)" : "translateX(100%)",
-          visibility: menuOpen ? "visible" : "hidden",
-          transition: "transform .4s cubic-bezier(.2,.8,.2,1)",
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            padding: "18px 24px",
-            borderBottom: "1px solid rgba(125,211,252,0.12)",
-          }}
-        >
-          <div
-            style={{
-              fontFamily: "'Sora', sans-serif",
-              fontWeight: 700,
-              fontSize: 16,
-              color: "#f5f7ff",
-              display: "flex",
-              alignItems: "center",
-              gap: 10,
-            }}
-          >
-            <span
-              style={{
-                width: 9,
-                height: 9,
-                borderRadius: "50%",
-                background: "#e8b86d",
-                boxShadow: "0 0 14px 3px rgba(232,184,109,0.6)",
-              }}
-            />
-            Suara UMKM
-          </div>
-          <button
-            onClick={() => setMenuOpen(false)}
-            aria-label="Tutup menu"
-            style={{
-              width: 40,
-              height: 40,
-              borderRadius: 10,
-              background: "rgba(125,211,252,0.08)",
-              border: "1px solid rgba(125,211,252,0.2)",
-              color: "#f5f7ff",
-              fontSize: 20,
-              lineHeight: 1,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              cursor: "pointer",
-            }}
-          >
-            ✕
-          </button>
-        </div>
-
-        <ul style={{ listStyle: "none", margin: 0, padding: "30px 28px", display: "flex", flexDirection: "column", gap: 4 }}>
-          {[
-            ["01", "Beranda", refs.hero],
-            ["02", "Testimoni", refs.testimoni],
-            ["03", "Kirim Cerita", refs.kirim],
-          ].map(([num, label, ref]) => (
-            <li key={label} style={{ borderBottom: "1px solid rgba(125,211,252,0.08)" }}>
-              <a
-                onClick={() => scrollTo(ref)}
-                style={{
-                  display: "block",
-                  padding: "16px 4px",
-                  color: "#f5f7ff",
-                  fontFamily: "'Sora', sans-serif",
-                  fontWeight: 600,
-                  fontSize: 19,
-                  cursor: "pointer",
-                  opacity: menuOpen ? 1 : 0,
-                  transform: menuOpen ? "translateX(0)" : "translateX(24px)",
-                  transition: "opacity .4s ease, transform .4s ease",
-                }}
-              >
-                <span style={{ color: "#6f7da6", fontFamily: "'Inter', sans-serif", fontWeight: 400, fontSize: 13, marginRight: 10 }}>
-                  {num}
-                </span>
-                {label}
-              </a>
-            </li>
-          ))}
-        </ul>
-
-        <div style={{ marginTop: "auto", padding: "20px 28px 30px", borderTop: "1px solid rgba(125,211,252,0.1)" }}>
-          <a
-            onClick={() => scrollTo(refs.kirim)}
-            style={{
-              display: "block",
-              textAlign: "center",
-              background: "linear-gradient(135deg,#f3d9a8,#e8b86d)",
-              color: "#1a1304",
-              fontFamily: "'Sora', sans-serif",
-              fontWeight: 700,
-              fontSize: 15,
-              padding: "13px 0",
-              borderRadius: 999,
-              cursor: "pointer",
-            }}
-          >
-            Kirim Testimoni Saya
-          </a>
-        </div>
-      </nav>
-    </>
-  );
-}
-
-/* ============================================================
-   APP UTAMA
-   ============================================================ */
-export default function TestimoniUMKM() {
-  const [items, setItems] = useState(seedTestimonials);
-  const [loading, setLoading] = useState(true);
-  const [status, setStatus] = useState("idle"); // idle | saving | success | error
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [lastAddedId, setLastAddedId] = useState(null);
-
-  const heroRef = useRef(null);
-  const testimoniRef = useRef(null);
-  const kirimRef = useRef(null);
-
-  // muat data dari storage saat pertama kali dibuka
-  useEffect(() => {
-    let mounted = true;
-    (async () => {
-      try {
-        const result = await window.storage.get(STORAGE_KEY, true);
-        if (mounted && result && result.value) {
-          const parsed = JSON.parse(result.value);
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            setItems(parsed);
-          }
-        }
-      } catch (err) {
-        // belum ada data tersimpan — pakai data contoh
-      } finally {
-        if (mounted) setLoading(false);
-      }
-    })();
-    return () => {
-      mounted = false;
-    };
-  }, []);
-
-  useEffect(() => {
-    if (menuOpen) {
-      document.body.style.overflow = "hidden";
+    if (saved) {
+      lastAddedId = newItem.id;
+      renderGrid();
+      testimoniForm.reset();
+      charCount.textContent = '0';
+      formSuccess.classList.add('show');
+      setTimeout(() => {
+        document.getElementById('testimoni').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 200);
     } else {
-      document.body.style.overflow = "";
+      formError.textContent = 'Gagal menyimpan. Mohon coba kirim sekali lagi.';
+      formError.classList.add('show');
     }
-  }, [menuOpen]);
+  }, 350);
+});
 
-  useEffect(() => {
-    if (status === "success") {
-      const t = setTimeout(() => setStatus("idle"), 4000);
-      return () => clearTimeout(t);
-    }
-  }, [status]);
+/* ============ MOBILE NAVBAR ============ */
+const hamburgerBtn = document.getElementById('hamburgerBtn');
+const closeMenuBtn = document.getElementById('closeMenuBtn');
+const mobileMenu = document.getElementById('mobileMenu');
+const menuLinks = document.querySelectorAll('[data-menu-link]');
 
-  const handleAddTestimonial = useCallback(
-    async ({ name, biz, city, quote }) => {
-      setStatus("saving");
-      const newItem = {
-        id: `t-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
-        quote,
-        name,
-        biz,
-        city,
-        color: AVATAR_COLORS[Math.floor(Math.random() * AVATAR_COLORS.length)],
-        createdAt: Date.now(),
-      };
-      const updated = [newItem, ...items];
-      try {
-        const saved = await window.storage.set(STORAGE_KEY, JSON.stringify(updated), true);
-        if (!saved) throw new Error("storage set returned null");
-        setItems(updated);
-        setLastAddedId(newItem.id);
-        setStatus("success");
-        setTimeout(() => {
-          testimoniRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-        }, 250);
-      } catch (err) {
-        setStatus("error");
-      }
-    },
-    [items]
-  );
-
-  const refs = { hero: heroRef, testimoni: testimoniRef, kirim: kirimRef };
-
-  return (
-    <div style={{ position: "relative", minHeight: "100vh", color: "#f5f7ff", fontFamily: "'Inter', sans-serif", overflowX: "hidden" }}>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap');
-        html { scroll-behavior: smooth; }
-        * { box-sizing: border-box; }
-        ::placeholder { color: #5a6690; }
-        input:focus, textarea:focus { border-color: rgba(125,211,252,0.55) !important; box-shadow: 0 0 0 3px rgba(78,168,255,0.15); }
-        @media (max-width: 760px) {
-          .nav-links-desktop { display: none !important; }
-          .hamburger-btn { display: flex !important; }
-        }
-        @media (max-width: 560px) {
-          .form-row-2col { grid-template-columns: 1fr !important; }
-        }
-        @media (prefers-reduced-motion: reduce) {
-          html { scroll-behavior: auto; }
-        }
-      `}</style>
-
-      <ParticleBackground />
-      <div
-        style={{
-          position: "fixed",
-          inset: 0,
-          zIndex: 1,
-          pointerEvents: "none",
-          background: "radial-gradient(ellipse 120% 90% at 50% 50%, transparent 40%, #060a16 100%)",
-        }}
-      />
-
-      <Navbar menuOpen={menuOpen} setMenuOpen={setMenuOpen} refs={refs} />
-
-      {/* HERO */}
-      <section
-        ref={heroRef}
-        style={{
-          padding: "calc(clamp(40px,10vh,110px) + 70px) 24px clamp(40px,8vh,70px)",
-          textAlign: "center",
-          maxWidth: 1180,
-          margin: "0 auto",
-          position: "relative",
-          zIndex: 2,
-        }}
-      >
-        <Reveal
-          as="span"
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 8,
-            fontSize: 12,
-            letterSpacing: "0.14em",
-            textTransform: "uppercase",
-            color: "#7dd3fc",
-            border: "1px solid rgba(125,211,252,0.25)",
-            background: "rgba(78,168,255,0.08)",
-            padding: "7px 16px",
-            borderRadius: 999,
-            marginBottom: 28,
-          }}
-        >
-          ✨ Cerita Nyata, Dampak Nyata
-        </Reveal>
-
-        <Reveal
-          as="h1"
-          delay={70}
-          style={{
-            fontFamily: "'Sora', sans-serif",
-            fontWeight: 800,
-            fontSize: "clamp(32px,7.2vw,62px)",
-            lineHeight: 1.1,
-            letterSpacing: "-0.01em",
-            margin: "0 0 20px",
-          }}
-        >
-          Bukan sekadar usaha kecil,
-          <br />
-          <span
-            style={{
-              background: "linear-gradient(90deg,#f3d9a8,#7dd3fc)",
-              WebkitBackgroundClip: "text",
-              backgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-            }}
-          >
-            ini cerita yang naik kelas.
-          </span>
-        </Reveal>
-
-        <Reveal
-          as="p"
-          delay={140}
-          style={{
-            fontSize: "clamp(15px,2.6vw,19px)",
-            color: "#aab6d9",
-            maxWidth: 620,
-            margin: "0 auto 36px",
-            lineHeight: 1.6,
-          }}
-        >
-          Dari warung pinggir jalan sampai toko online yang mengirim ke seluruh negeri —
-          inilah suara para pelaku UMKM yang membagikan perjalanan mereka.
-        </Reveal>
-
-        <Reveal
-          delay={210}
-          style={{ display: "flex", justifyContent: "center", gap: "clamp(24px,6vw,64px)", flexWrap: "wrap" }}
-        >
-          {[
-            ["120", "+", "UMKM Bergabung"],
-            ["4.9", "/5", "Rata-rata Kepuasan"],
-            ["35", "+", "Kota di Indonesia"],
-          ].map(([num, suffix, label]) => (
-            <div key={label} style={{ textAlign: "center", minWidth: 90 }}>
-              <div style={{ fontFamily: "'Sora', sans-serif", fontWeight: 800, fontSize: "clamp(22px,5vw,32px)" }}>
-                <span style={{ color: "#e8b86d" }}>{num}</span>
-                {suffix}
-              </div>
-              <div style={{ fontSize: 12, color: "#6f7da6", letterSpacing: "0.04em", textTransform: "uppercase", marginTop: 4 }}>
-                {label}
-              </div>
-            </div>
-          ))}
-        </Reveal>
-      </section>
-
-      {/* SECTION KHUSUS: TESTIMONI */}
-      <section
-        ref={testimoniRef}
-        style={{
-          position: "relative",
-          zIndex: 2,
-          padding: "70px 0 100px",
-          marginTop: 10,
-          borderTop: "1px solid rgba(125,211,252,0.1)",
-          borderBottom: "1px solid rgba(125,211,252,0.1)",
-          background: "linear-gradient(180deg, transparent 0%, rgba(11,19,48,0.4) 12%, rgba(11,19,48,0.4) 88%, transparent 100%)",
-        }}
-      >
-        <div style={{ textAlign: "center", margin: "0 auto 44px", maxWidth: 620, padding: "0 24px" }}>
-          <Reveal as="span" style={{ fontSize: 12, letterSpacing: "0.14em", textTransform: "uppercase", color: "#7dd3fc", marginBottom: 12, display: "block" }}>
-            Testimoni Pilihan
-          </Reveal>
-          <Reveal as="h2" delay={70} style={{ fontFamily: "'Sora', sans-serif", fontWeight: 700, fontSize: "clamp(24px,5vw,34px)", margin: 0, lineHeight: 1.2 }}>
-            Apa kata mereka yang sudah merasakan?
-          </Reveal>
-          {!loading && (
-            <Reveal
-              as="p"
-              delay={130}
-              style={{ fontSize: 13, color: "#6f7da6", marginTop: 14, marginBottom: 0 }}
-            >
-              Menampilkan {items.length} testimoni dari UMKM di seluruh Indonesia.
-            </Reveal>
-          )}
-        </div>
-
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(3, 1fr)",
-            gap: 22,
-            padding: "0 24px",
-            maxWidth: 1180,
-            margin: "0 auto",
-          }}
-          className="testimoni-grid"
-        >
-          <style>{`
-            @media (max-width: 980px) { .testimoni-grid { grid-template-columns: repeat(2,1fr) !important; } }
-            @media (max-width: 640px) { .testimoni-grid { grid-template-columns: 1fr !important; gap: 16px !important; } }
-          `}</style>
-          {items.map((t, i) => (
-            <TestimonialCard key={t.id} t={t} index={i} isNew={t.id === lastAddedId} />
-          ))}
-        </div>
-      </section>
-
-      {/* SECTION KHUSUS: KOLOM KIRIM TESTIMONI */}
-      <section
-        ref={kirimRef}
-        style={{ padding: "90px 24px 100px", position: "relative", zIndex: 2 }}
-      >
-        <div style={{ textAlign: "center", maxWidth: 620, margin: "0 auto 40px" }}>
-          <Reveal as="span" style={{ fontSize: 12, letterSpacing: "0.14em", textTransform: "uppercase", color: "#7dd3fc", marginBottom: 12, display: "block" }}>
-            Kolom Testimoni
-          </Reveal>
-          <Reveal as="h2" delay={70} style={{ fontFamily: "'Sora', sans-serif", fontWeight: 700, fontSize: "clamp(24px,5vw,34px)", margin: "0 0 14px", lineHeight: 1.2 }}>
-            Punya cerita usaha sendiri?
-          </Reveal>
-          <Reveal as="p" delay={140} style={{ color: "#aab6d9", fontSize: 15, margin: 0, lineHeight: 1.6 }}>
-            Isi kolom di bawah ini. Testimoni Anda akan langsung tampil di daftar atas dan
-            jadi inspirasi untuk UMKM lain di seluruh Indonesia.
-          </Reveal>
-        </div>
-
-        <Reveal delay={200}>
-          <TestimoniForm onSubmit={handleAddTestimonial} status={status} />
-        </Reveal>
-      </section>
-
-      <footer
-        style={{
-          textAlign: "center",
-          padding: 24,
-          fontSize: 12,
-          color: "#6f7da6",
-          position: "relative",
-          zIndex: 2,
-          borderTop: "1px solid rgba(125,211,252,0.1)",
-        }}
-      >
-        © 2026 Suara UMKM. Dibuat dengan semangat untuk usaha kecil Indonesia.
-      </footer>
-    </div>
-  );
+function openMenu() {
+  mobileMenu.classList.add('is-open');
+  mobileMenu.setAttribute('aria-hidden', 'false');
+  hamburgerBtn.setAttribute('aria-expanded', 'true');
+  document.body.classList.add('menu-open');
 }
+
+function closeMenu() {
+  mobileMenu.classList.remove('is-open');
+  mobileMenu.setAttribute('aria-hidden', 'true');
+  hamburgerBtn.setAttribute('aria-expanded', 'false');
+  document.body.classList.remove('menu-open');
+}
+
+hamburgerBtn.addEventListener('click', openMenu);
+closeMenuBtn.addEventListener('click', closeMenu);
+menuLinks.forEach(link => link.addEventListener('click', closeMenu));
+
+// tutup menu dengan tombol Escape
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && mobileMenu.classList.contains('is-open')) closeMenu();
+});
+
+/* ============ REVEAL ON SCROLL (animasi satu-satu) ============ */
+const revealEls = document.querySelectorAll('.reveal');
+revealEls.forEach((el, i) => {
+  el.style.transitionDelay = (i % 8) * 70 + 'ms';
+});
+
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('is-visible');
+      observer.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+
+revealEls.forEach(el => observer.observe(el));
+
+/* ============ PARTICLE NETWORK BACKGROUND ============ */
+const canvas = document.getElementById('particle-canvas');
+const ctx = canvas.getContext('2d');
+let particles = [];
+let mouse = { x: null, y: null, active: false };
+let dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+function isMobile() { return window.innerWidth < 700; }
+
+function resize() {
+  const w = window.innerWidth;
+  const h = window.innerHeight;
+  canvas.width = w * dpr;
+  canvas.height = h * dpr;
+  canvas.style.width = w + 'px';
+  canvas.style.height = h + 'px';
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  initParticles(w, h);
+}
+
+function initParticles(w, h) {
+  const count = isMobile() ? 38 : 85;
+  particles = [];
+  for (let i = 0; i < count; i++) {
+    particles.push({
+      x: Math.random() * w,
+      y: Math.random() * h,
+      vx: (Math.random() - 0.5) * 0.35,
+      vy: (Math.random() - 0.5) * 0.35,
+      r: Math.random() * 1.6 + 0.6
+    });
+  }
+}
+
+function step() {
+  const w = window.innerWidth;
+  const h = window.innerHeight;
+  ctx.clearRect(0, 0, w, h);
+
+  const linkDist = isMobile() ? 110 : 150;
+
+  // update + draw particles
+  for (let i = 0; i < particles.length; i++) {
+    const p = particles[i];
+    p.x += p.vx;
+    p.y += p.vy;
+    if (p.x < 0 || p.x > w) p.vx *= -1;
+    if (p.y < 0 || p.y > h) p.vy *= -1;
+
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(125,211,252,0.85)';
+    ctx.fill();
+  }
+
+  // draw links
+  for (let i = 0; i < particles.length; i++) {
+    for (let j = i + 1; j < particles.length; j++) {
+      const a = particles[i], b = particles[j];
+      const dx = a.x - b.x, dy = a.y - b.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < linkDist) {
+        const opacity = (1 - dist / linkDist) * 0.5;
+        ctx.beginPath();
+        ctx.moveTo(a.x, a.y);
+        ctx.lineTo(b.x, b.y);
+        ctx.strokeStyle = `rgba(78,168,255,${opacity})`;
+        ctx.lineWidth = 0.7;
+        ctx.stroke();
+      }
+    }
+
+    // link to mouse
+    if (mouse.active) {
+      const dx = particles[i].x - mouse.x;
+      const dy = particles[i].y - mouse.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      const mouseDist = isMobile() ? 130 : 200;
+      if (dist < mouseDist) {
+        const opacity = (1 - dist / mouseDist) * 0.65;
+        ctx.beginPath();
+        ctx.moveTo(particles[i].x, particles[i].y);
+        ctx.lineTo(mouse.x, mouse.y);
+        ctx.strokeStyle = `rgba(232,184,109,${opacity})`;
+        ctx.lineWidth = 0.8;
+        ctx.stroke();
+      }
+    }
+  }
+
+  requestAnimationFrame(step);
+}
+
+window.addEventListener('mousemove', (e) => {
+  mouse.x = e.clientX;
+  mouse.y = e.clientY;
+  mouse.active = true;
+});
+window.addEventListener('mouseleave', () => { mouse.active = false; });
+window.addEventListener('resize', resize);
+
+resize();
+requestAnimationFrame(step);
+
+/* ============ INISIALISASI AWAL ============ */
+renderGrid();
+</script>
+
+</body>
+</html>
