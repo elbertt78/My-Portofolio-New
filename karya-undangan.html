@@ -512,21 +512,17 @@
   }
   .portfolio-grid{
     display:grid;
-    grid-template-columns:repeat(3, 1fr);
-    gap:24px;
+    grid-template-columns:repeat(auto-fit, minmax(320px, 1fr));
+    gap:28px;
     margin-top:46px;
   }
-  @media (max-width:980px){
-    .portfolio-grid{grid-template-columns:repeat(2,1fr);}
-  }
   @media (max-width:640px){
-    .portfolio-grid{grid-template-columns:1fr; gap:20px;}
+    .portfolio-grid{gap:18px;}
   }
   .portfolio-card{
-    position:relative;
-    background:linear-gradient(180deg, rgba(217,168,160,0.05), rgba(15,21,46,0.5));
+    background:linear-gradient(180deg, rgba(217,168,160,0.04), rgba(15,21,46,0.5));
     border:1px solid var(--card-border);
-    border-radius:18px;
+    border-radius:14px;
     overflow:hidden;
     transition:transform .35s ease, border-color .35s ease, box-shadow .35s ease;
     display:flex;
@@ -545,7 +541,6 @@
     justify-content:center;
     border-bottom:1px solid var(--card-border);
     overflow:hidden;
-    background:linear-gradient(135deg, rgba(217,168,160,0.22), rgba(10,15,36,0.65));
   }
   .portfolio-thumb::before{
     content:'';
@@ -564,53 +559,62 @@
     color:var(--rose-soft);
     letter-spacing:0.02em;
     z-index:1;
+    opacity:0.9;
   }
   .portfolio-body{
-    padding:20px 22px 24px;
+    padding:26px 26px 28px;
     display:flex;
     flex-direction:column;
-    gap:12px;
+    gap:14px;
     flex:1;
+  }
+  .portfolio-tags{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+  }
+  .portfolio-tag{
+    font-size:11px;
+    font-weight:600;
+    letter-spacing:0.05em;
+    color:var(--rose-soft);
+    background:rgba(217,168,160,0.1);
+    border:1px solid rgba(217,168,160,0.22);
+    padding:4px 10px;
+    border-radius:100px;
   }
   .portfolio-title{
     font-family:'Cormorant Garamond', serif;
     font-weight:600;
-    font-size:19px;
+    font-size:1.2rem;
   }
   .portfolio-desc{
     color:var(--ink-300);
-    font-size:13px;
+    font-size:0.92rem;
     line-height:1.65;
   }
   .portfolio-link{
     margin-top:auto;
-    padding-top:4px;
+    padding-top:8px;
     display:inline-flex;
     align-items:center;
-    gap:7px;
+    gap:8px;
     font-size:13px;
-    color:var(--rose-soft);
+    font-weight:500;
+    color:var(--ink-100);
     text-decoration:none;
-    border-bottom:1px solid rgba(217,168,160,0.4);
-    width:max-content;
   }
   .portfolio-link svg{transition:transform .25s ease;}
   .portfolio-card:hover .portfolio-link svg{transform:translate(3px,-3px);}
-  .delete-btn{
-    position:absolute;
-    top:10px; right:10px;
-    z-index:3;
-    width:26px; height:26px;
-    border-radius:50%;
-    background:rgba(8,12,28,0.85);
-    border:1px solid rgba(140,170,255,0.3);
-    color:var(--ink-100);
-    cursor:pointer;
-    font-size:14px;
-    line-height:1;
-  }
 
   /* ---------- FORM TESTIMONI ---------- */
+  .grid-status{
+    color:var(--ink-500);
+    font-size:14px;
+    padding:30px 0;
+    text-align:center;
+    grid-column:1 / -1;
+  }
   .form-wrap{
     margin-top:60px;
   }
@@ -887,34 +891,110 @@
 <section class="portfolio content" id="portofolio">
   <p class="eyebrow reveal">Hasil Karya</p>
   <h2 class="section-title reveal">Contoh Undangan yang Sudah Kami Buat</h2>
-  <div class="portfolio-grid" id="portfolioGrid">
-    <p class="grid-status">Memuat portofolio…</p>
-  </div>
+  <div class="portfolio-grid">
 
-  <div class="form-wrap" id="adminUploadPanel">
-    <div class="form-card">
-      <p class="eyebrow">Hasil Karya</p>
-      <h3>Tambahkan Hasil Karya</h3>
-      <p class="form-intro">Tambahkan contoh undangan untuk ditampilkan di galeri portofolio ini.</p>
-      <form id="portfolioForm">
-        <div class="field">
-          <label for="pTitle">Judul / Nama Tema</label>
-          <input type="text" id="pTitle" placeholder="Contoh: Tema Minimalis Klasik" required>
+    <article class="portfolio-card reveal">
+      <div class="portfolio-thumb" style="background:linear-gradient(135deg, rgba(217,168,160,0.22), rgba(10,15,36,0.65));">
+        <span class="portfolio-thumb-mono">DA</span>
+      </div>
+      <div class="portfolio-body">
+        <div class="portfolio-tags">
+          <span class="portfolio-tag">Tema Klasik Elegan</span>
+          <span class="portfolio-tag">RSVP Digital</span>
         </div>
-        <div class="field">
-          <label for="pDesc">Deskripsi Singkat (opsional)</label>
-          <input type="text" id="pDesc" placeholder="Contoh: Dibuat untuk pernikahan Dimas & Ayu">
+        <h3 class="portfolio-title">Dimas &amp; Ayu — Yogyakarta</h3>
+        <p class="portfolio-desc">Undangan pernikahan bertema klasik dengan palet krem dan emas, dilengkapi galeri foto, hitung mundur, dan formulir RSVP online.</p>
+        <a href="#" class="portfolio-link">Lihat contoh undangan
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
+        </a>
+      </div>
+    </article>
+
+    <article class="portfolio-card reveal">
+      <div class="portfolio-thumb" style="background:linear-gradient(135deg, rgba(140,170,255,0.18), rgba(10,15,36,0.65));">
+        <span class="portfolio-thumb-mono">BC</span>
+      </div>
+      <div class="portfolio-body">
+        <div class="portfolio-tags">
+          <span class="portfolio-tag">Minimalis Modern</span>
+          <span class="portfolio-tag">Amplop Digital</span>
         </div>
-        <div class="field">
-          <label for="pLink">Tautan Demo (opsional)</label>
-          <input type="url" id="pLink" placeholder="https://...">
+        <h3 class="portfolio-title">Bagas &amp; Citra — Bandung</h3>
+        <p class="portfolio-desc">Desain minimalis hitam-putih modern dengan animasi halaman terbuka, fitur amplop digital, dan peta lokasi interaktif.</p>
+        <a href="#" class="portfolio-link">Lihat contoh undangan
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
+        </a>
+      </div>
+    </article>
+
+    <article class="portfolio-card reveal">
+      <div class="portfolio-thumb" style="background:linear-gradient(135deg, rgba(217,168,160,0.28), rgba(10,15,36,0.55));">
+        <span class="portfolio-thumb-mono">RS</span>
+      </div>
+      <div class="portfolio-body">
+        <div class="portfolio-tags">
+          <span class="portfolio-tag">Floral Romantis</span>
+          <span class="portfolio-tag">Musik Latar</span>
         </div>
-        <div class="form-submit-row">
-          <button type="submit" class="btn-submit" id="portfolioSubmitBtn">Tambahkan</button>
-          <span class="form-msg" id="portfolioMsg" aria-live="polite"></span>
+        <h3 class="portfolio-title">Reza &amp; Salsabila — Surabaya</h3>
+        <p class="portfolio-desc">Tema floral romantis dengan ilustrasi bunga mawar, musik latar otomatis, kolom ucapan & doa, serta countdown hari pernikahan.</p>
+        <a href="#" class="portfolio-link">Lihat contoh undangan
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
+        </a>
+      </div>
+    </article>
+
+    <article class="portfolio-card reveal">
+      <div class="portfolio-thumb" style="background:linear-gradient(135deg, rgba(180,200,160,0.18), rgba(10,15,36,0.65));">
+        <span class="portfolio-thumb-mono">FI</span>
+      </div>
+      <div class="portfolio-body">
+        <div class="portfolio-tags">
+          <span class="portfolio-tag">Nature Rustic</span>
+          <span class="portfolio-tag">Galeri Foto</span>
         </div>
-      </form>
-    </div>
+        <h3 class="portfolio-title">Fajar &amp; Intan — Semarang</h3>
+        <p class="portfolio-desc">Nuansa alam hijau sage dengan elemen daun dan kayu, galeri foto pasangan, serta halaman cerita cinta yang personal.</p>
+        <a href="#" class="portfolio-link">Lihat contoh undangan
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
+        </a>
+      </div>
+    </article>
+
+    <article class="portfolio-card reveal">
+      <div class="portfolio-thumb" style="background:linear-gradient(135deg, rgba(217,168,160,0.2), rgba(90,60,100,0.3));">
+        <span class="portfolio-thumb-mono">YM</span>
+      </div>
+      <div class="portfolio-body">
+        <div class="portfolio-tags">
+          <span class="portfolio-tag">Garden Party</span>
+          <span class="portfolio-tag">RSVP + Tabel</span>
+        </div>
+        <h3 class="portfolio-title">Yoga &amp; Maya — Bali</h3>
+        <p class="portfolio-desc">Estetika garden party dengan warna ungu lavender dan emas, RSVP multi-sesi untuk akad dan resepsi, dilengkapi konfirmasi otomatis.</p>
+        <a href="#" class="portfolio-link">Lihat contoh undangan
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
+        </a>
+      </div>
+    </article>
+
+    <article class="portfolio-card reveal">
+      <div class="portfolio-thumb" style="background:linear-gradient(135deg, rgba(200,220,255,0.12), rgba(10,15,36,0.7));">
+        <span class="portfolio-thumb-mono">AP</span>
+      </div>
+      <div class="portfolio-body">
+        <div class="portfolio-tags">
+          <span class="portfolio-tag">Mewah Kontemporer</span>
+          <span class="portfolio-tag">Animasi Premium</span>
+        </div>
+        <h3 class="portfolio-title">Aldi &amp; Putri — Jakarta</h3>
+        <p class="portfolio-desc">Desain mewah kontemporer dengan animasi parallax, efek partikel bergerak, dan halaman penuh yang memukau tamu sejak detik pertama.</p>
+        <a href="#" class="portfolio-link">Lihat contoh undangan
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
+        </a>
+      </div>
+    </article>
+
   </div>
 </section>
 
@@ -1287,131 +1367,10 @@ document.querySelectorAll('.count-up').forEach(el => countObserver.observe(el));
   });
 })();
 
-/* ============ PORTOFOLIO — DATA & STORAGE ============ */
-const PORTFOLIO_KEY = 'portfolio-items';
-
-let portfolioItems = [];
-
-async function loadPortfolio(){
-  try{
-    const result = await window.storage.get(PORTFOLIO_KEY, true);
-    portfolioItems = (result && result.value) ? JSON.parse(result.value) : [];
-  }catch(err){
-    portfolioItems = [];
-  }
-}
-
-async function savePortfolio(){
-  try{
-    const result = await window.storage.set(PORTFOLIO_KEY, JSON.stringify(portfolioItems), true);
-    return !!result;
-  }catch(err){
-    console.error('Gagal menyimpan portofolio:', err);
-    return false;
-  }
-}
-
-/* Ambil 1-2 huruf inisial dari judul untuk ditampilkan sebagai monogram thumbnail */
-function getMonogram(title){
-  if(!title) return '?';
-  const words = title.trim().split(/\s+/).filter(Boolean);
-  if(words.length === 1) return words[0].slice(0, 2).toUpperCase();
-  return (words[0][0] + words[1][0]).toUpperCase();
-}
-
-function portfolioCardHTML(item){
-  return `
-    <div class="portfolio-card reveal">
-      <button type="button" class="delete-btn" data-id="${item.id}" aria-label="Hapus contoh ini">&times;</button>
-      <div class="portfolio-thumb">
-        <span class="portfolio-thumb-mono">${getMonogram(item.title)}</span>
-      </div>
-      <div class="portfolio-body">
-        <div class="portfolio-title">${item.title}</div>
-        ${item.desc ? `<div class="portfolio-desc">${item.desc}</div>` : ''}
-        ${item.link ? `<a href="${item.link}" target="_blank" rel="noopener" class="portfolio-link">Lihat Contoh
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
-          </a>` : ''}
-      </div>
-    </div>
-  `;
-}
-
-function renderPortfolio(){
-  const grid = document.getElementById('portfolioGrid');
-  if(portfolioItems.length === 0){
-    grid.innerHTML = '<p class="grid-status">Belum ada contoh undangan yang ditambahkan.</p>';
-  }else{
-    grid.innerHTML = portfolioItems.slice().reverse().map(portfolioCardHTML).join('');
-  }
-  document.querySelectorAll('.delete-btn').forEach(btn => {
-    btn.addEventListener('click', async () => {
-      const id = btn.dataset.id;
-      portfolioItems = portfolioItems.filter(i => String(i.id) !== id);
-      renderPortfolio();
-      await savePortfolio();
-    });
-  });
-  observeReveals();
-}
-
-/* ============ FORM UNGGAH PORTOFOLIO ============ */
-(function(){
-  const form = document.getElementById('portfolioForm');
-  const titleInput = document.getElementById('pTitle');
-  const descInput = document.getElementById('pDesc');
-  const linkInput = document.getElementById('pLink');
-  const submitBtn = document.getElementById('portfolioSubmitBtn');
-  const msg = document.getElementById('portfolioMsg');
-
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const title = titleInput.value.trim();
-    if(!title){
-      msg.textContent = 'Isi judul / nama tema terlebih dahulu.';
-      msg.classList.add('is-error');
-      return;
-    }
-
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Menambahkan…';
-    msg.textContent = '';
-    msg.classList.remove('is-error');
-
-    try{
-      const item = {
-        id: Date.now() + '-' + Math.random().toString(36).slice(2, 7),
-        title: title,
-        desc: descInput.value.trim(),
-        link: linkInput.value.trim()
-      };
-      portfolioItems.push(item);
-      renderPortfolio();
-
-      const ok = await savePortfolio();
-      if(ok){
-        msg.textContent = 'Berhasil ditambahkan dan tampil di portofolio!';
-        form.reset();
-      }else{
-        msg.textContent = 'Tampil di layar ini, tapi gagal disinkronkan. Coba kirim ulang.';
-        msg.classList.add('is-error');
-      }
-    }catch(err){
-      msg.textContent = 'Gagal menambahkan. Coba lagi.';
-      msg.classList.add('is-error');
-    }finally{
-      submitBtn.disabled = false;
-      submitBtn.textContent = 'Tambahkan';
-    }
-  });
-})();
-
 /* ============ INISIALISASI AWAL ============ */
 (async function(){
   await loadSubmittedTestimonials();
-  await loadPortfolio();
   renderTestimonials();
-  renderPortfolio();
   observeReveals();
 })();
 </script>
