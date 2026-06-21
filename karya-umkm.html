@@ -536,6 +536,115 @@
     transition-duration:1.9s;
   }
 
+  /* ---------- HASIL KARYA ---------- */
+  .karya-section{
+    position:relative;
+    z-index:2;
+    padding:90px 24px 100px;
+    max-width:var(--max-w);
+    margin:0 auto;
+  }
+  .karya-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(320px, 1fr));
+    gap:28px;
+    margin-top:50px;
+  }
+  @media (max-width:640px){
+    .karya-grid{ gap:18px; }
+  }
+  .karya-card{
+    background:linear-gradient(180deg, rgba(78,168,255,0.04), rgba(11,19,48,0.5));
+    border:1px solid var(--card-border);
+    border-radius:14px;
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+    transition:transform .35s ease, border-color .35s ease, box-shadow .35s ease;
+  }
+  .karya-card:hover{
+    transform:translateY(-6px);
+    border-color:rgba(78,168,255,0.45);
+    box-shadow:0 20px 40px -20px rgba(59,130,246,0.35);
+  }
+  .karya-thumb{
+    aspect-ratio:16/10;
+    position:relative;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-bottom:1px solid var(--card-border);
+    overflow:hidden;
+  }
+  .karya-thumb::before{
+    content:'';
+    position:absolute;
+    inset:0;
+    background-image:
+      linear-gradient(rgba(78,168,255,0.12) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(78,168,255,0.12) 1px, transparent 1px);
+    background-size:26px 26px;
+    mask-image:radial-gradient(ellipse at center, black 30%, transparent 75%);
+    -webkit-mask-image:radial-gradient(ellipse at center, black 30%, transparent 75%);
+  }
+  .karya-mono{
+    font-family:'Sora', sans-serif;
+    font-weight:800;
+    font-size:2.6rem;
+    letter-spacing:-0.02em;
+    z-index:1;
+    opacity:0.9;
+  }
+  .karya-body{
+    padding:26px 26px 28px;
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+    flex:1;
+  }
+  .karya-tags{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+  }
+  .karya-tag{
+    font-family:'Inter', sans-serif;
+    font-size:0.68rem;
+    font-weight:600;
+    letter-spacing:0.04em;
+    color:var(--line-blue-soft);
+    background:rgba(78,168,255,0.1);
+    border:1px solid rgba(125,211,252,0.22);
+    padding:4px 10px;
+    border-radius:100px;
+  }
+  .karya-title{
+    font-family:'Sora', sans-serif;
+    font-size:1.15rem;
+    font-weight:700;
+  }
+  .karya-desc{
+    color:var(--ink-300);
+    font-size:0.92rem;
+    line-height:1.65;
+  }
+  .karya-link{
+    margin-top:auto;
+    padding-top:8px;
+    font-size:0.82rem;
+    font-family:'Inter', sans-serif;
+    font-weight:500;
+    color:var(--ink-100);
+    text-decoration:none;
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    transition:color .2s ease;
+  }
+  .karya-link svg{ transition:transform .25s ease; }
+  .karya-card:hover .karya-link{ color:var(--line-blue-soft); }
+  .karya-card:hover .karya-link svg{ transform:translate(3px,-3px); }
+
   /* ---------- CTA / FOOTER ---------- */
   .cta{
     text-align:center;
@@ -690,6 +799,7 @@
 
     <ul class="nav-links">
       <li><a href="#beranda">Beranda</a></li>
+      <li><a href="#karya">Hasil Karya</a></li>
       <li><a href="#testimoni">Testimoni</a></li>
       <li><a href="#kirim" class="nav-cta">Kirim Cerita</a></li>
     </ul>
@@ -709,8 +819,9 @@
   </div>
   <ul class="mobile-menu-links">
     <li><a href="#beranda" data-menu-link><span>01</span>Beranda</a></li>
-    <li><a href="#testimoni" data-menu-link><span>02</span>Testimoni</a></li>
-    <li><a href="#kirim" data-menu-link><span>03</span>Kirim Cerita</a></li>
+    <li><a href="#karya" data-menu-link><span>02</span>Hasil Karya</a></li>
+    <li><a href="#testimoni" data-menu-link><span>03</span>Testimoni</a></li>
+    <li><a href="#kirim" data-menu-link><span>04</span>Kirim Cerita</a></li>
   </ul>
   <div class="mobile-menu-foot">
     <a href="#kirim" class="btn" data-menu-link>Kirim Testimoni Saya</a>
@@ -732,6 +843,120 @@
       <div class="stat"><div class="num"><span class="count-up" data-target="4.9" data-decimals="1">0</span>/5</div><div class="label">Rata-rata Kepuasan</div></div>
       <div class="stat"><div class="num"><span class="count-up" data-target="35" data-decimals="0">0</span>+</div><div class="label">Kota di Indonesia</div></div>
     </div>
+  </div>
+</section>
+
+<section class="karya-section" id="karya">
+  <div class="section-label">
+    <span class="kicker reveal">Hasil Karya</span>
+    <h2 class="reveal">Proyek UMKM pilihan yang sudah kami bantu</h2>
+    <svg class="draw-line reveal" viewBox="0 0 64 6"><path d="M2 3 L62 3"/></svg>
+  </div>
+
+  <div class="karya-grid">
+
+    <article class="karya-card reveal">
+      <div class="karya-thumb" style="background:linear-gradient(135deg, rgba(78,168,255,0.18), rgba(11,19,48,0.7));">
+        <span class="karya-mono" style="color:#7dd3fc;">NB</span>
+      </div>
+      <div class="karya-body">
+        <div class="karya-tags">
+          <span class="karya-tag">Kuliner</span>
+          <span class="karya-tag">Toko Online</span>
+        </div>
+        <h3 class="karya-title">Nasi Bu Siti — Bandung</h3>
+        <p class="karya-desc">Transformasi warung nasi pinggir jalan menjadi toko online dengan sistem pemesanan WhatsApp, menu digital, dan integrasi ojek online. Omzet naik 2× dalam 3 bulan.</p>
+        <a href="#" class="karya-link">Lihat studi kasus
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
+        </a>
+      </div>
+    </article>
+
+    <article class="karya-card reveal">
+      <div class="karya-thumb" style="background:linear-gradient(135deg, rgba(232,184,109,0.18), rgba(11,19,48,0.7));">
+        <span class="karya-mono" style="color:#f3d9a8;">KR</span>
+      </div>
+      <div class="karya-body">
+        <div class="karya-tags">
+          <span class="karya-tag">Makanan Kemasan</span>
+          <span class="karya-tag">Distribusi Lokal</span>
+        </div>
+        <h3 class="karya-title">Kerupuk Renyah Maknyus — Tegal</h3>
+        <p class="karya-desc">Rebranding produk kerupuk rumahan dengan kemasan baru yang menarik, website catalog, dan koneksi ke jaringan minimarket lokal di 4 kota.</p>
+        <a href="#" class="karya-link">Lihat studi kasus
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
+        </a>
+      </div>
+    </article>
+
+    <article class="karya-card reveal">
+      <div class="karya-thumb" style="background:linear-gradient(135deg, rgba(125,211,252,0.15), rgba(11,19,48,0.7));">
+        <span class="karya-mono" style="color:#7dd3fc;">KG</span>
+      </div>
+      <div class="karya-body">
+        <div class="karya-tags">
+          <span class="karya-tag">Kopi & Pertanian</span>
+          <span class="karya-tag">Ekspansi Antar Kota</span>
+        </div>
+        <h3 class="karya-title">Kopi Gunung Lestari — Toraja</h3>
+        <p class="karya-desc">Pendampingan legalitas usaha, pembuatan landing page premium, dan strategi pengiriman sample kopi spesialti ke café-café di Makassar dan Jakarta.</p>
+        <a href="#" class="karya-link">Lihat studi kasus
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
+        </a>
+      </div>
+    </article>
+
+    <article class="karya-card reveal">
+      <div class="karya-thumb" style="background:linear-gradient(135deg, rgba(232,184,109,0.15), rgba(78,168,255,0.1), rgba(11,19,48,0.6));">
+        <span class="karya-mono" style="color:#e8b86d;">RH</span>
+      </div>
+      <div class="karya-body">
+        <div class="karya-tags">
+          <span class="karya-tag">Fashion</span>
+          <span class="karya-tag">Konten & Foto Produk</span>
+        </div>
+        <h3 class="karya-title">RH Apparel — Yogyakarta</h3>
+        <p class="karya-desc">Pelatihan foto produk, copywriting toko online, dan pembuatan katalog digital. Toko Shopee-nya naik ke level Star Seller dalam 60 hari.</p>
+        <a href="#" class="karya-link">Lihat studi kasus
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
+        </a>
+      </div>
+    </article>
+
+    <article class="karya-card reveal">
+      <div class="karya-thumb" style="background:linear-gradient(135deg, rgba(78,168,255,0.12), rgba(125,211,252,0.1), rgba(11,19,48,0.65));">
+        <span class="karya-mono" style="color:#4ea8ff;">TR</span>
+      </div>
+      <div class="karya-body">
+        <div class="karya-tags">
+          <span class="karya-tag">Kerajinan Tangan</span>
+          <span class="karya-tag">Permodalan</span>
+        </div>
+        <h3 class="karya-title">Tas Rajut Dewi — Solo</h3>
+        <p class="karya-desc">Bantuan pengajuan KUR, pembuatan portofolio produk digital, dan koneksi ke marketplace ekspor. Kapasitas produksi bertambah 3× setelah penambahan 2 mesin baru.</p>
+        <a href="#" class="karya-link">Lihat studi kasus
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
+        </a>
+      </div>
+    </article>
+
+    <article class="karya-card reveal">
+      <div class="karya-thumb" style="background:linear-gradient(135deg, rgba(125,211,252,0.12), rgba(232,184,109,0.1), rgba(11,19,48,0.65));">
+        <span class="karya-mono" style="color:#7dd3fc;">CG</span>
+      </div>
+      <div class="karya-body">
+        <div class="karya-tags">
+          <span class="karya-tag">Camilan</span>
+          <span class="karya-tag">Komunitas & Kolaborasi</span>
+        </div>
+        <h3 class="karya-title">Camilan Gurih Bambang — Surabaya</h3>
+        <p class="karya-desc">Bergabung ke jaringan UMKM kolaborasi, co-branding dengan 3 pelaku usaha lain, dan peluncuran paket bundling yang terjual habis dalam 2 minggu pertama.</p>
+        <a href="#" class="karya-link">Lihat studi kasus
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
+        </a>
+      </div>
+    </article>
+
   </div>
 </section>
 
