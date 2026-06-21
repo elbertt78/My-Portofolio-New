@@ -99,48 +99,17 @@ button{font-family:inherit; cursor:pointer;}
 }
 
 /* ambient star field — drifts slowly behind the whole page */
-.starfield{
-  position:fixed; inset:0;
-  z-index:-2;
-  background:var(--ink);
-  overflow:hidden;
-  pointer-events:none;
-}
-.starfield canvas#particleCanvas{
-  position:absolute; inset:0;
+/* ---- Particle network background ---- */
+#particle-bg{
+  position:fixed;
+  inset:0;
   width:100%; height:100%;
-  display:block;
-  will-change:transform;
-}
-.starfield .glow{
-  position:absolute;
-  width:60vw; height:60vw;
-  max-width:900px; max-height:900px;
-  border-radius:50%;
-  filter:blur(120px);
-  opacity:.20;
-  animation:floatGlow 26s ease-in-out infinite;
-  will-change:transform;
-  backface-visibility:hidden;
-}
-.starfield .glow.g1{
-  top:-10%; left:-10%;
-  background:radial-gradient(circle, var(--azure) 0%, transparent 70%);
-  animation-delay:0s;
-}
-.starfield .glow.g2{
-  bottom:-15%; right:-10%;
-  background:radial-gradient(circle, var(--gold) 0%, transparent 70%);
-  opacity:.12;
-  animation-delay:-13s;
-  animation-duration:32s;
-}
-@keyframes floatGlow{
-  0%, 100%{transform:translate(0,0) scale(1);}
-  50%{transform:translate(4%, 5%) scale(1.12);}
-}
-@media (prefers-reduced-motion: reduce){
-  .starfield .glow{animation:none;}
+  z-index:-2;
+  pointer-events:none;
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 0%, rgba(29,78,216,0.13), transparent 60%),
+    radial-gradient(ellipse 70% 50% at 100% 100%, rgba(29,78,216,0.09), transparent 60%),
+    var(--ink);
 }
 
 /* ============ NAV ============ */
@@ -1008,11 +977,7 @@ footer .flinks a:hover{color:var(--gold-bright);}
 </head>
 <body>
 
-<div class="starfield">
-  <div class="glow g1"></div>
-  <div class="glow g2"></div>
-  <canvas id="particleCanvas" aria-hidden="true"></canvas>
-</div>
+<canvas id="particle-bg" aria-hidden="true"></canvas>
 <div class="grain"></div>
 
 <header id="siteHeader">
@@ -1411,164 +1376,109 @@ links.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
 // reduced motion check (dipakai beberapa fitur di bawah)
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-// ===== particle background animation =====
+// ===== Particle network background (biru gelap) =====
 (function(){
-  const canvas = document.getElementById('particleCanvas');
-  if(!canvas) return;
+  const canvas = document.getElementById('particle-bg');
   const ctx = canvas.getContext('2d');
-
-  const palette = [
-    'rgba(238,241,251,OPA)',  // paper — putih lembut
-    'rgba(238,241,251,OPA)',
-    'rgba(238,241,251,OPA)',
-    'rgba(201,163,104,OPA)',  // gold
-    'rgba(111,155,219,OPA)'   // azure-bright
-  ];
-  const LINK_DIST = 130;
-  const LINK_DIST_SQ = LINK_DIST * LINK_DIST;
-
-  let w = 0, h = 0, dpr = Math.min(window.devicePixelRatio || 1, 2);
-  let particles = [];
-  let mouseX = -9999, mouseY = -9999;
-  let targetParX = 0, targetParY = 0, parX = 0, parY = 0;
-  let rafId = null;
-  let running = false;
-
-  function rand(min, max){ return Math.random() * (max - min) + min; }
-
-  function particleCount(){
-    const area = w * h;
-    return Math.max(36, Math.min(110, Math.round(area / 16000)));
-  }
-
-  function makeParticle(){
-    return {
-      x: rand(0, w),
-      y: rand(0, h),
-      vx: rand(-0.10, 0.10),
-      vy: rand(-0.08, 0.08),
-      r: rand(0.7, 1.9),
-      baseAlpha: rand(0.35, 0.9),
-      phase: rand(0, Math.PI * 2),
-      twinkleSpeed: rand(0.4, 1.1),
-      color: palette[Math.floor(rand(0, palette.length))]
-    };
-  }
+  let width, height, particles, animId;
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const mouse = { x: null, y: null, radius: 150 };
 
   function resize(){
-    const rect = canvas.parentElement.getBoundingClientRect();
-    w = Math.max(window.innerWidth, rect.width);
-    h = Math.max(window.innerHeight, rect.height);
-    canvas.width = Math.round(w * dpr);
-    canvas.height = Math.round(h * dpr);
-    canvas.style.width = w + 'px';
-    canvas.style.height = h + 'px';
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    width  = canvas.width  = window.innerWidth;
+    height = canvas.height = window.innerHeight;
+  }
 
-    const count = particleCount();
-    if(particles.length === 0){
-      particles = Array.from({length: count}, makeParticle);
-    } else if(particles.length < count){
-      while(particles.length < count){ particles.push(makeParticle()); }
-    } else if(particles.length > count){
-      particles.length = count;
+  function countForWidth(w){
+    if(w < 600)  return 50;
+    if(w < 1000) return 85;
+    return 120;
+  }
+
+  class Particle {
+    constructor(){
+      this.x  = Math.random() * width;
+      this.y  = Math.random() * height;
+      this.vx = (Math.random() - 0.5) * 0.4;
+      this.vy = (Math.random() - 0.5) * 0.4;
+      this.r  = Math.random() * 1.8 + 0.6;
+    }
+    update(){
+      this.x += this.vx;
+      this.y += this.vy;
+      if(this.x < 0 || this.x > width)  this.vx *= -1;
+      if(this.y < 0 || this.y > height) this.vy *= -1;
+      if(mouse.x !== null){
+        const dx   = this.x - mouse.x;
+        const dy   = this.y - mouse.y;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        if(dist < mouse.radius){
+          const force = (mouse.radius - dist) / mouse.radius;
+          this.x += (dx / dist) * force * 1.5;
+          this.y += (dy / dist) * force * 1.5;
+        }
+      }
+    }
+    draw(){
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(147, 197, 253, 0.70)';
+      ctx.fill();
     }
   }
 
-  function drawStatic(){
-    ctx.clearRect(0, 0, w, h);
-    particles.forEach(p => {
-      ctx.beginPath();
-      ctx.fillStyle = p.color.replace('OPA', p.baseAlpha.toFixed(2));
-      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-      ctx.fill();
-    });
+  function init(){
+    resize();
+    particles = Array.from({length: countForWidth(width)}, () => new Particle());
   }
 
-  let t = 0;
-  function tick(){
-    t += 1;
-    ctx.clearRect(0, 0, w, h);
-
-    // parallax halus mengikuti kursor
-    parX += (targetParX - parX) * 0.04;
-    parY += (targetParY - parY) * 0.04;
-    canvas.style.transform = `translate3d(${parX}px, ${parY}px, 0)`;
-
-    // gerakkan & gambar partikel
-    for(let i = 0; i < particles.length; i++){
-      const p = particles[i];
-      p.x += p.vx;
-      p.y += p.vy;
-      if(p.x < -10) p.x = w + 10;
-      if(p.x > w + 10) p.x = -10;
-      if(p.y < -10) p.y = h + 10;
-      if(p.y > h + 10) p.y = -10;
-
-      const twinkle = 0.65 + 0.35 * Math.sin(t * 0.02 * p.twinkleSpeed + p.phase);
-      const alpha = p.baseAlpha * twinkle;
-
-      ctx.beginPath();
-      ctx.fillStyle = p.color.replace('OPA', alpha.toFixed(2));
-      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-      ctx.fill();
-    }
-
-    // garis penghubung tipis antar partikel berdekatan (efek constellation)
+  function connect(){
+    const maxDist = width < 700 ? 120 : 160;
     for(let i = 0; i < particles.length; i++){
       for(let j = i + 1; j < particles.length; j++){
-        const a = particles[i], b = particles[j];
-        const dx = a.x - b.x, dy = a.y - b.y;
-        const distSq = dx * dx + dy * dy;
-        if(distSq < LINK_DIST_SQ){
-          const lineAlpha = (1 - distSq / LINK_DIST_SQ) * 0.16;
+        const dx   = particles[i].x - particles[j].x;
+        const dy   = particles[i].y - particles[j].y;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        if(dist < maxDist){
+          const opacity = (1 - dist / maxDist) * 0.55;
           ctx.beginPath();
-          ctx.strokeStyle = `rgba(226,233,255,${lineAlpha.toFixed(3)})`;
+          ctx.strokeStyle = `rgba(59, 130, 246, ${opacity})`;
           ctx.lineWidth = 1;
-          ctx.moveTo(a.x, a.y);
-          ctx.lineTo(b.x, b.y);
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
           ctx.stroke();
         }
       }
     }
-
-    if(running){ rafId = requestAnimationFrame(tick); }
   }
 
-  function start(){
-    if(running || reduceMotion) return;
-    running = true;
-    rafId = requestAnimationFrame(tick);
-  }
-  function stop(){
-    running = false;
-    if(rafId){ cancelAnimationFrame(rafId); rafId = null; }
+  function animate(){
+    ctx.clearRect(0, 0, width, height);
+    particles.forEach(p => { p.update(); p.draw(); });
+    connect();
+    animId = requestAnimationFrame(animate);
   }
 
-  let resizeTimer = null;
   window.addEventListener('resize', () => {
-    clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(() => {
-      resize();
-      if(reduceMotion){ drawStatic(); }
-    }, 150);
+    cancelAnimationFrame(animId);
+    init();
+    if(!prefersReduced){ animate(); } else { particles.forEach(p=>p.draw()); connect(); }
   });
 
-  window.addEventListener('mousemove', (e) => {
-    mouseX = e.clientX; mouseY = e.clientY;
-    targetParX = ((mouseX / window.innerWidth) - 0.5) * -14;
-    targetParY = ((mouseY / window.innerHeight) - 0.5) * -14;
-  }, {passive:true});
+  window.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
+  window.addEventListener('mouseleave', () => { mouse.x = null; mouse.y = null; });
 
   document.addEventListener('visibilitychange', () => {
-    if(document.hidden){ stop(); } else { start(); }
+    if(document.hidden){ cancelAnimationFrame(animId); }
+    else if(!prefersReduced){ animate(); }
   });
 
-  resize();
-  if(reduceMotion){
-    drawStatic();
+  init();
+  if(prefersReduced){
+    particles.forEach(p => p.draw());
+    connect();
   } else {
-    start();
+    animate();
   }
 })();
 
