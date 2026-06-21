@@ -524,61 +524,78 @@
   }
   .portfolio-card{
     position:relative;
-    background:var(--card-bg);
+    background:linear-gradient(180deg, rgba(217,168,160,0.05), rgba(15,21,46,0.5));
     border:1px solid var(--card-border);
-    border-radius:20px;
-    padding:16px;
+    border-radius:18px;
+    overflow:hidden;
     transition:transform .35s ease, border-color .35s ease, box-shadow .35s ease;
+    display:flex;
+    flex-direction:column;
   }
   .portfolio-card:hover{
-    transform:translateY(-4px);
+    transform:translateY(-6px);
     border-color:rgba(217,168,160,0.4);
-    box-shadow:0 18px 40px -20px rgba(140,170,255,0.3);
+    box-shadow:0 20px 40px -20px rgba(217,168,160,0.35);
   }
-  .phone-frame{
+  .portfolio-thumb{
+    aspect-ratio:16/10;
     position:relative;
-    width:100%;
-    aspect-ratio:9/18;
-    border-radius:22px;
-    border:2px solid rgba(140,170,255,0.25);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-bottom:1px solid var(--card-border);
     overflow:hidden;
-    background:#0a0f24;
+    background:linear-gradient(135deg, rgba(217,168,160,0.22), rgba(10,15,36,0.65));
   }
-  .phone-frame::before{
+  .portfolio-thumb::before{
     content:'';
     position:absolute;
-    top:9px; left:50%;
-    transform:translateX(-50%);
-    width:34%; height:5px;
-    background:rgba(140,170,255,0.35);
-    border-radius:999px;
-    z-index:2;
+    inset:0;
+    background-image:
+      linear-gradient(rgba(217,168,160,0.14) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(217,168,160,0.14) 1px, transparent 1px);
+    background-size:26px 26px;
+    mask-image:radial-gradient(ellipse at center, black 30%, transparent 75%);
   }
-  .phone-frame img{
-    width:100%; height:100%;
-    object-fit:cover;
-    display:block;
+  .portfolio-thumb-mono{
+    font-family:'Cormorant Garamond', serif;
+    font-weight:700;
+    font-size:2.6rem;
+    color:var(--rose-soft);
+    letter-spacing:0.02em;
+    z-index:1;
   }
-  .portfolio-body{padding:14px 4px 4px;}
+  .portfolio-body{
+    padding:20px 22px 24px;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+    flex:1;
+  }
   .portfolio-title{
     font-family:'Cormorant Garamond', serif;
     font-weight:600;
-    font-size:17px;
+    font-size:19px;
   }
   .portfolio-desc{
     color:var(--ink-300);
     font-size:13px;
-    line-height:1.6;
-    margin-top:4px;
+    line-height:1.65;
   }
   .portfolio-link{
-    display:inline-block;
-    margin-top:10px;
+    margin-top:auto;
+    padding-top:4px;
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
     font-size:13px;
     color:var(--rose-soft);
     text-decoration:none;
     border-bottom:1px solid rgba(217,168,160,0.4);
+    width:max-content;
   }
+  .portfolio-link svg{transition:transform .25s ease;}
+  .portfolio-card:hover .portfolio-link svg{transform:translate(3px,-3px);}
   .delete-btn{
     position:absolute;
     top:10px; right:10px;
@@ -592,53 +609,6 @@
     font-size:14px;
     line-height:1;
   }
-
-  /* ---------- GERBANG ADMIN ---------- */
-  .admin-gate{
-    margin-top:40px;
-    text-align:center;
-  }
-  .admin-link{
-    background:none;
-    border:none;
-    color:var(--ink-500);
-    font-size:12.5px;
-    text-decoration:underline;
-    cursor:pointer;
-    letter-spacing:0.03em;
-  }
-  .admin-link:hover{color:var(--ink-300);}
-  .admin-link:disabled{cursor:default; text-decoration:none; color:var(--rose-soft);}
-  .admin-pin-row{
-    display:flex;
-    gap:10px;
-    justify-content:center;
-    margin-top:14px;
-    flex-wrap:wrap;
-  }
-  .admin-pin-row input{
-    background:rgba(8,12,28,0.6);
-    border:1px solid rgba(140,170,255,0.2);
-    border-radius:10px;
-    padding:10px 14px;
-    color:var(--ink-100);
-    font-family:'Jost', sans-serif;
-    font-size:13.5px;
-    width:180px;
-  }
-  .admin-pin-row input:focus{outline:none; border-color:rgba(217,168,160,0.55);}
-  .btn-ghost-sm{
-    padding:10px 18px;
-    border-radius:999px;
-    border:1px solid rgba(140,170,255,0.25);
-    background:none;
-    color:var(--ink-100);
-    font-family:'Jost', sans-serif;
-    font-size:13px;
-    cursor:pointer;
-    transition:border-color .25s ease;
-  }
-  .btn-ghost-sm:hover{border-color:rgba(140,170,255,0.5);}
 
   /* ---------- FORM TESTIMONI ---------- */
   .form-wrap{
@@ -838,7 +808,7 @@
       <a href="#testimoni">Testimoni</a>
       <a href="#kontak">Kontak</a>
     </nav>
-    <a href="#kontak" class="btn-nav">Buat Undangan</a>
+    <a href="https://wa.me/6285190666158?text=Halo%20Sehati%2C%20saya%20ingin%20mulai%20buat%20undangan%20pernikahan%20online" target="_blank" rel="noopener" class="btn-nav">Buat Undangan</a>
     <button class="hamburger" id="hamburgerBtn" aria-label="Buka menu" aria-expanded="false" aria-controls="mobileMenu">
       <span></span><span></span><span></span>
     </button>
@@ -860,7 +830,7 @@
     <a href="#testimoni">Testimoni</a>
     <a href="#kontak">Kontak</a>
   </nav>
-  <a href="#kontak" class="btn-nav mobile-cta">Buat Undangan</a>
+  <a href="https://wa.me/6285190666158?text=Halo%20Sehati%2C%20saya%20ingin%20mulai%20buat%20undangan%20pernikahan%20online" target="_blank" rel="noopener" class="btn-nav mobile-cta">Buat Undangan</a>
 </div>
 
 <section class="hero content" id="beranda">
@@ -873,7 +843,7 @@
   <h1 class="hero-title reveal">Cerita Cinta, Diabadikan<br>dengan <em>Indah</em></h1>
   <p class="hero-sub reveal">Sehati membantu ratusan pasangan menghadirkan undangan online yang elegan dan personal — lengkap dengan RSVP, galeri foto, dan hitung mundur menuju hari bahagia.</p>
   <div class="hero-cta reveal">
-    <a href="#kontak" class="btn-primary">Buat Undangan Sekarang</a>
+    <a href="https://wa.me/6285190666158?text=Halo%20Sehati%2C%20saya%20ingin%20mulai%20buat%20undangan%20pernikahan%20online" target="_blank" rel="noopener" class="btn-primary">Buat Undangan Sekarang</a>
     <a href="#testimoni" class="btn-ghost">Lihat Testimoni</a>
   </div>
   <div class="stat-row reveal">
@@ -915,26 +885,17 @@
 </section>
 
 <section class="portfolio content" id="portofolio">
-  <p class="eyebrow reveal">Portofolio Kami</p>
+  <p class="eyebrow reveal">Hasil Karya</p>
   <h2 class="section-title reveal">Contoh Undangan yang Sudah Kami Buat</h2>
   <div class="portfolio-grid" id="portfolioGrid">
     <p class="grid-status">Memuat portofolio…</p>
   </div>
 
-  <div class="admin-gate reveal" id="adminGate">
-    <button type="button" class="admin-link" id="adminToggle">Kelola Portofolio (Admin)</button>
-    <div class="admin-pin-row" id="adminPinRow" hidden>
-      <input type="password" id="adminPinInput" placeholder="Masukkan PIN admin">
-      <button type="button" class="btn-ghost-sm" id="adminPinSubmit">Masuk</button>
-      <span class="form-msg is-error" id="adminPinMsg"></span>
-    </div>
-  </div>
-
-  <div class="form-wrap" id="adminUploadPanel" hidden>
+  <div class="form-wrap" id="adminUploadPanel">
     <div class="form-card">
-      <p class="eyebrow">Mode Admin Aktif</p>
-      <h3>Unggah Contoh Undangan Baru</h3>
-      <p class="form-intro">Form ini hanya tampil setelah PIN admin dimasukkan. Gambar otomatis dikompres sebelum disimpan.</p>
+      <p class="eyebrow">Hasil Karya</p>
+      <h3>Tambahkan Hasil Karya</h3>
+      <p class="form-intro">Tambahkan contoh undangan untuk ditampilkan di galeri portofolio ini.</p>
       <form id="portfolioForm">
         <div class="field">
           <label for="pTitle">Judul / Nama Tema</label>
@@ -948,12 +909,8 @@
           <label for="pLink">Tautan Demo (opsional)</label>
           <input type="url" id="pLink" placeholder="https://...">
         </div>
-        <div class="field">
-          <label for="pImage">Gambar / Tangkapan Layar Undangan</label>
-          <input type="file" id="pImage" accept="image/*" required>
-        </div>
         <div class="form-submit-row">
-          <button type="submit" class="btn-submit" id="portfolioSubmitBtn">Unggah</button>
+          <button type="submit" class="btn-submit" id="portfolioSubmitBtn">Tambahkan</button>
           <span class="form-msg" id="portfolioMsg" aria-live="polite"></span>
         </div>
       </form>
@@ -1018,7 +975,7 @@
 <section class="cta content" id="kontak">
   <h2 class="reveal">Undangan Kalian, Tinggal Selangkah Lagi</h2>
   <p class="reveal">Wujudkan undangan pernikahan impian dalam waktu kurang dari satu jam, tanpa perlu keahlian desain.</p>
-  <a href="#" class="btn-primary reveal">Mulai Buat Undangan</a>
+  <a href="https://wa.me/6285190666158?text=Halo%20Sehati%2C%20saya%20ingin%20mulai%20buat%20undangan%20pernikahan%20online" target="_blank" rel="noopener" class="btn-primary reveal">Mulai Buat Undangan</a>
 </section>
 
 <footer class="content">
@@ -1332,14 +1289,8 @@ document.querySelectorAll('.count-up').forEach(el => countObserver.observe(el));
 
 /* ============ PORTOFOLIO — DATA & STORAGE ============ */
 const PORTFOLIO_KEY = 'portfolio-items';
-/* Ganti PIN ini sesuai keinginan Anda. Catatan: ini hanya gerbang ringan
-   (kode ini terlihat siapa pun yang membuka source halaman), bukan
-   autentikasi sungguhan — cukup untuk mencegah pengunjung biasa
-   tidak sengaja membuka form unggah. */
-const ADMIN_PIN = 'sehati-admin';
 
 let portfolioItems = [];
-let isAdmin = false;
 
 async function loadPortfolio(){
   try{
@@ -1360,15 +1311,27 @@ async function savePortfolio(){
   }
 }
 
+/* Ambil 1-2 huruf inisial dari judul untuk ditampilkan sebagai monogram thumbnail */
+function getMonogram(title){
+  if(!title) return '?';
+  const words = title.trim().split(/\s+/).filter(Boolean);
+  if(words.length === 1) return words[0].slice(0, 2).toUpperCase();
+  return (words[0][0] + words[1][0]).toUpperCase();
+}
+
 function portfolioCardHTML(item){
   return `
     <div class="portfolio-card reveal">
-      ${isAdmin ? `<button type="button" class="delete-btn" data-id="${item.id}" aria-label="Hapus contoh ini">&times;</button>` : ''}
-      <div class="phone-frame"><img src="${item.image}" alt="${item.title}" loading="lazy"></div>
+      <button type="button" class="delete-btn" data-id="${item.id}" aria-label="Hapus contoh ini">&times;</button>
+      <div class="portfolio-thumb">
+        <span class="portfolio-thumb-mono">${getMonogram(item.title)}</span>
+      </div>
       <div class="portfolio-body">
         <div class="portfolio-title">${item.title}</div>
         ${item.desc ? `<div class="portfolio-desc">${item.desc}</div>` : ''}
-        ${item.link ? `<a href="${item.link}" target="_blank" rel="noopener" class="portfolio-link">Lihat Contoh &rarr;</a>` : ''}
+        ${item.link ? `<a href="${item.link}" target="_blank" rel="noopener" class="portfolio-link">Lihat Contoh
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
+          </a>` : ''}
       </div>
     </div>
   `;
@@ -1377,7 +1340,7 @@ function portfolioCardHTML(item){
 function renderPortfolio(){
   const grid = document.getElementById('portfolioGrid');
   if(portfolioItems.length === 0){
-    grid.innerHTML = '<p class="grid-status">Belum ada contoh undangan yang diunggah.</p>';
+    grid.innerHTML = '<p class="grid-status">Belum ada contoh undangan yang ditambahkan.</p>';
   }else{
     grid.innerHTML = portfolioItems.slice().reverse().map(portfolioCardHTML).join('');
   }
@@ -1392,113 +1355,53 @@ function renderPortfolio(){
   observeReveals();
 }
 
-/* Kompres & ubah gambar jadi data URL sebelum disimpan, supaya hemat ukuran */
-function resizeImageFile(file, maxDim = 1100, quality = 0.82){
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const img = new Image();
-      img.onload = () => {
-        let w = img.width, h = img.height;
-        if(w > h && w > maxDim){ h = Math.round(h * maxDim / w); w = maxDim; }
-        else if(h >= w && h > maxDim){ w = Math.round(w * maxDim / h); h = maxDim; }
-        const canvas = document.createElement('canvas');
-        canvas.width = w; canvas.height = h;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, w, h);
-        resolve(canvas.toDataURL('image/jpeg', quality));
-      };
-      img.onerror = () => reject(new Error('Gagal memuat gambar'));
-      img.src = e.target.result;
-    };
-    reader.onerror = () => reject(new Error('Gagal membaca file'));
-    reader.readAsDataURL(file);
-  });
-}
-
-/* ============ GERBANG ADMIN (PIN) ============ */
-(function(){
-  const adminToggle = document.getElementById('adminToggle');
-  const pinRow = document.getElementById('adminPinRow');
-  const pinInput = document.getElementById('adminPinInput');
-  const pinSubmit = document.getElementById('adminPinSubmit');
-  const pinMsg = document.getElementById('adminPinMsg');
-  const uploadPanel = document.getElementById('adminUploadPanel');
-
-  adminToggle.addEventListener('click', () => {
-    pinRow.hidden = !pinRow.hidden;
-    if(!pinRow.hidden) pinInput.focus();
-  });
-
-  function tryUnlock(){
-    if(pinInput.value === ADMIN_PIN){
-      isAdmin = true;
-      uploadPanel.hidden = false;
-      pinRow.hidden = true;
-      adminToggle.textContent = 'Mode admin aktif';
-      adminToggle.disabled = true;
-      pinMsg.textContent = '';
-      renderPortfolio();
-    }else{
-      pinMsg.textContent = 'PIN salah, coba lagi.';
-    }
-  }
-  pinSubmit.addEventListener('click', tryUnlock);
-  pinInput.addEventListener('keydown', (e) => {
-    if(e.key === 'Enter'){ e.preventDefault(); tryUnlock(); }
-  });
-})();
-
 /* ============ FORM UNGGAH PORTOFOLIO ============ */
 (function(){
   const form = document.getElementById('portfolioForm');
   const titleInput = document.getElementById('pTitle');
   const descInput = document.getElementById('pDesc');
   const linkInput = document.getElementById('pLink');
-  const imageInput = document.getElementById('pImage');
   const submitBtn = document.getElementById('portfolioSubmitBtn');
   const msg = document.getElementById('portfolioMsg');
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const file = imageInput.files[0];
-    if(!file){
-      msg.textContent = 'Pilih gambar terlebih dahulu.';
+    const title = titleInput.value.trim();
+    if(!title){
+      msg.textContent = 'Isi judul / nama tema terlebih dahulu.';
       msg.classList.add('is-error');
       return;
     }
 
     submitBtn.disabled = true;
-    submitBtn.textContent = 'Mengunggah…';
+    submitBtn.textContent = 'Menambahkan…';
     msg.textContent = '';
     msg.classList.remove('is-error');
 
     try{
-      const dataUrl = await resizeImageFile(file);
       const item = {
         id: Date.now() + '-' + Math.random().toString(36).slice(2, 7),
-        title: titleInput.value.trim(),
+        title: title,
         desc: descInput.value.trim(),
-        link: linkInput.value.trim(),
-        image: dataUrl
+        link: linkInput.value.trim()
       };
       portfolioItems.push(item);
       renderPortfolio();
 
       const ok = await savePortfolio();
       if(ok){
-        msg.textContent = 'Berhasil diunggah dan tampil di portofolio!';
+        msg.textContent = 'Berhasil ditambahkan dan tampil di portofolio!';
         form.reset();
       }else{
-        msg.textContent = 'Tampil di layar ini, tapi gagal disinkronkan. Coba unggah ulang.';
+        msg.textContent = 'Tampil di layar ini, tapi gagal disinkronkan. Coba kirim ulang.';
         msg.classList.add('is-error');
       }
     }catch(err){
-      msg.textContent = 'Gagal memproses gambar. Coba file lain.';
+      msg.textContent = 'Gagal menambahkan. Coba lagi.';
       msg.classList.add('is-error');
     }finally{
       submitBtn.disabled = false;
-      submitBtn.textContent = 'Unggah';
+      submitBtn.textContent = 'Tambahkan';
     }
   });
 })();
